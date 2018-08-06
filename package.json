@@ -1,0 +1,14 @@
+{
+  "name": "selenium_udemy",
+  "version": "1.0.0",
+  "description": "QA using Selenium and Nightwatch",
+  "main": "nightwatch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Wang",
+  "license": "ISC",
+  "dependencies": {
+    "nightwatch": "^0.9.21"
+  }
+}
