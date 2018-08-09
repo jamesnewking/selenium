@@ -24,7 +24,6 @@ module.exports = function(browser){
     this.userLogout = function(){
         browser
             .click('/html/body/div[1]/div[2]/div/div/div/div[1]/p/a')
-
     };
     this.closeBrowser = function(){
         browser.end()
