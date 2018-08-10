@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites errors="0"
             failures="0"
-            tests="7">
+            tests="17">
 
   <testsuite name="portfolio.portfolio"
     errors="0" failures="0" hostname="" id="" package="portfolio" skipped="0"
-    tests="7" time="6.457" timestamp="Fri, 10 Aug 2018 00:09:16 GMT">
+    tests="17" time="24.91" timestamp="Fri, 10 Aug 2018 05:58:42 GMT">
   
-    <testcase name="webpage title" classname="portfolio.portfolio" time="5.662" assertions="2">
+    <testcase name="webpage title" classname="portfolio.portfolio" time="6.220" assertions="2">
 
     
 
@@ -17,23 +17,57 @@
     <testcase name="click on catch me" classname="portfolio.portfolio" time="0.1840" assertions="0">
     </testcase>
   
-    <testcase name="switch to active modal" classname="portfolio.portfolio" time="0.04800" assertions="1">
+    <testcase name="switch to active modal" classname="portfolio.portfolio" time="0.7010" assertions="1">
 
     
     </testcase>
   
-    <testcase name="move to modal element" classname="portfolio.portfolio" time="0.1210" assertions="0">
+    <testcase name="move to modal element" classname="portfolio.portfolio" time="0.05400" assertions="0">
     </testcase>
   
-    <testcase name="scroll down" classname="portfolio.portfolio" time="0.04700" assertions="0">
+    <testcase name="scroll down" classname="portfolio.portfolio" time="0.01800" assertions="0">
     </testcase>
   
-    <testcase name="verify modal title" classname="portfolio.portfolio" time="0.1190" assertions="1">
+    <testcase name="verify modal title" classname="portfolio.portfolio" time="0.07400" assertions="1">
 
     
     </testcase>
   
-    <testcase name="click on catch me live project" classname="portfolio.portfolio" time="0.2760" assertions="0">
+    <testcase name="click on catch me live project" classname="portfolio.portfolio" time="0.2060" assertions="0">
+    </testcase>
+  
+    <testcase name="switch to catch me window" classname="portfolio.portfolio" time="0.05700" assertions="0">
+    </testcase>
+  
+    <testcase name="wait for catch me window to open" classname="portfolio.portfolio" time="1.135" assertions="1">
+
+    
+    </testcase>
+  
+    <testcase name="verify catch me window title" classname="portfolio.portfolio" time="0.3040" assertions="1">
+
+    
+    </testcase>
+  
+    <testcase name="scroll down the window" classname="portfolio.portfolio" time="0.09800" assertions="0">
+    </testcase>
+  
+    <testcase name="in catch me window, hover over button A" classname="portfolio.portfolio" time="2.203" assertions="0">
+    </testcase>
+  
+    <testcase name="in catch me window, hover over button B" classname="portfolio.portfolio" time="2.065" assertions="0">
+    </testcase>
+  
+    <testcase name="in catch me window, hover over button C" classname="portfolio.portfolio" time="2.080" assertions="0">
+    </testcase>
+  
+    <testcase name="in catch me map, click on marker A" classname="portfolio.portfolio" time="3.185" assertions="0">
+    </testcase>
+  
+    <testcase name="in catch me map, click on marker B" classname="portfolio.portfolio" time="3.187" assertions="0">
+    </testcase>
+  
+    <testcase name="in catch me map, click on marker C" classname="portfolio.portfolio" time="3.142" assertions="0">
     </testcase>
   
 
