@@ -1,10 +1,6 @@
 var helper = require('../../pages/helper');
-var locate = {
-    catch_me:'#portfolio > div > div:nth-child(2) > div:nth-child(2)',
-    catch_me_title:'#portfolioModal2 > div > div > div.container > div > div > div > h2',
-    catch_me_link:'#portfolioModal2 > div > div > div.container > div > div > div > a > img',
-};
-
+var locate = require('../../pages/locate');
+var catchMe = require('../../pages/catch_me');
 
 module.exports = {
     tags : ['portfolio'],
@@ -25,7 +21,7 @@ module.exports = {
     },
     'switch to active modal' : function (browser){
         browser
-            .waitForElementPresent(locate.catch_me_title,3000);
+            .waitForElementVisible(locate.catch_me_title,3000);
     },
     'move to modal element' : function (browser){
         browser
@@ -43,7 +39,55 @@ module.exports = {
     },
     'click on catch me live project' : function(browser){
         browser
-            .click(locate.catch_me_link);
+            .click(locate.catch_me_link)
+    },
+    'switch to catch me window' : function(browser){
+        browser
+            .windowHandles(function(result){
+                console.log('the window names are: ', result);
+                browser.switchWindow(result.value[1]);
+            })
+    },
+    'wait for catch me window to open' : function(browser){
+        browser
+            .waitForElementPresent('body > div.container-fluid.header > div > div.offset-xs-2.col-xs-6.offset-sm-1.col-sm-6.offset-md-1.col-md-6 > div:nth-child(1) > span',5000)
+    },
+    'verify catch me window title' : function(browser){
+        browser
+            .assert.title('Catch Me If You Can')
+    },
+    'scroll down the window' : function(browser){
+        catchMe(browser).scrollDown();
+    },
+    'in catch me window, hover over button A' : function(browser){
+        catchMe(browser).overButtonA();
+        browser
+            .pause(2000);//wait until speech is done
+    },
+    'in catch me window, hover over button B' : function(browser){
+        catchMe(browser).overButtonB();
+        browser
+            .pause(2000);//wait until speech is done
+    },
+    'in catch me window, hover over button C' : function(browser){
+        catchMe(browser).overButtonC();
+        browser
+            .pause(2000);//wait until speech is done
+    },
+    'in catch me map, click on marker A' : function(browser){
+        catchMe(browser).clickMapA();
+        browser
+            .pause(3000);
+    },
+    'in catch me map, click on marker B' : function(browser){
+        catchMe(browser).clickMapB();
+        browser
+            .pause(3000);
+    },
+    'in catch me map, click on marker C' : function(browser){
+        catchMe(browser).clickMapC();
+        browser
+            .pause(3000);
     },
     after : function(browser){
         //utils(browser).closeBrowser;
