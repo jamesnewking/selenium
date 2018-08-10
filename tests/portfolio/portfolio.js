@@ -1,11 +1,14 @@
 var helper = require('../../pages/helper');
 var locate = require('../../pages/locate');
 var catchMe = require('../../pages/catch_me');
+let winModal = '#modalContent > div > div.modal-content.wikipedia-text-bg.col-md-5.col-lg-5 > div.modal-header > h4';
 
 module.exports = {
     tags : ['portfolio'],
 
     before: function(browser){
+        // console.log('this is the log');
+        // console.log('I should see:',catchMe.winningModal);
         helper(browser).openBrowser();
     },
     'webpage title' : function (browser){
@@ -89,9 +92,33 @@ module.exports = {
         browser
             .pause(3000);
     },
+    'click on buttonA' : function(browser){
+        let foundAnswer = false;
+        catchMe(browser).clickButtonA();
+        browser.isVisible(winModal, function(result){
+            foundAnswer = result.value;
+        });
+        if(foundAnswer){
+            browser
+                .click(winModal)
+                .pause(2000)
+                .end();}
+        else { catchMe(browser).clickButtonB(); };
+        browser.isVisible(winModal, function(result){
+            foundAnswer = result.value;
+        });
+        if(foundAnswer) {
+            browser
+                .click(winModal)
+                .pause(2000)
+                .end();}
+         else {
+            catchMe(browser).clickButtonC(); };
+    },
     after : function(browser){
         //utils(browser).closeBrowser;
         browser
+            .click(winModal)
             .pause(2000)
             .end();
     }

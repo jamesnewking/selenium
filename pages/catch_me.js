@@ -7,6 +7,8 @@ module.exports = function(browser){
         mapB: '#theMap > div > div > div:nth-child(1) > div:nth-child(3) > div > div:nth-child(3) > div:nth-child(2) > img',
         mapC: '#theMap > div > div > div:nth-child(1) > div:nth-child(3) > div > div:nth-child(3) > div:nth-child(3) > img',
     };
+    //this.winningModal = '#modalContent > div > div.modal-content.wikipedia-text-bg.col-md-5.col-lg-5 > div.modal-header > h4';
+
     this.overButtonA = function(){
         browser
             .moveToElement(catch_loc.buttonA,10,10)
@@ -18,6 +20,18 @@ module.exports = function(browser){
     this.overButtonC = function(){
         browser
             .moveToElement(catch_loc.buttonC,10,10)
+    };
+    this.clickButtonA = function(){
+        browser
+            .click(catch_loc.buttonA)
+    };
+    this.clickButtonB = function(){
+        browser
+            .click(catch_loc.buttonB)
+    };
+    this.clickButtonC = function(){
+        browser
+            .click(catch_loc.buttonC)
     };
     this.clickMapA = function(){
         browser
@@ -38,6 +52,7 @@ module.exports = function(browser){
         browser
             .execute('scrollTo(0,500)');
     };
+
 
     return this;
 };
