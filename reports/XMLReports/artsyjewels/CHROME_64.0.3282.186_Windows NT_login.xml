@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites errors="2"
+            failures="1"
+            tests="3">
+
+  <testsuite name="artsyjewels.login"
+    errors="2" failures="1" hostname="" id="" package="artsyjewels" skipped="0"
+    tests="3" time="18.01" timestamp="Wed, 08 Aug 2018 21:56:48 GMT">
+  
+    <testcase name="Go to the login page" classname="artsyjewels.login" time="16.95" assertions="1">
+
+    
+    </testcase>
+  
+    <testcase name="Verify user logged in" classname="artsyjewels.login" time="0.03300" assertions="1">  <failure message="Testing if element &lt;/html/body/div[1]/div[2]/div/div/div/div[1]/h2&gt; contains text: &#34;generic_user&#34;. Element could not be located.">    at verifyUser (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\pages\utils.js:22:21)
+    at Object.Verify user logged in (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\tests\artsyjewels\login.js:17:24)</failure>
+
+    
+    </testcase>
+  
+    <testcase name="Logout of user account" classname="artsyjewels.login" time="1.029" assertions="0">
+    </testcase>
+  
+
+  
+    <system-err>
+      ERROR: Unable to locate element: &#34;/html/body/div[1]/div[2]/div/div/div/div[1]/h2&#34; using: xpath
+    at F.command (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\api\assertions\containsText.js:46:21)
+    at F.module.exports.BaseAssertion._scheduleAssertion (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\assertion.js:87:17)
+    at F.module.exports.BaseAssertion._executeCommand (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\assertion.js:82:17)
+    at AssertionInstance.commandFn [as _commandFn] (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\assertion.js:180:21)
+    at AsyncTree.runCommand (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\queue.js:154:30)
+    at AsyncTree.runChildNode (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\queue.js:114:8)
+    at AsyncTree.walkDown (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\queue.js:80:10)
+    at AsyncTree.traverse (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\queue.js:73:8)
+    at Object.queueRunner [as run] (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\core\queue.js:216:18)
+    at Nightwatch.start (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\index.js:206:14)
+ERROR: Unable to locate element: &#34;/html/body/div[1]/div[2]/div/div/div/div[1]/p/a&#34; using: xpath
+    at userLogout (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\pages\utils.js:26:14)
+    at Object.Logout of user account (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\tests\artsyjewels\login.js:21:24)
+    at Module.call (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\runner\module.js:62:34)
+    at C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\nightwatch\lib\runner\testcase.js:70:29
+    at _fulfilled (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\q\q.js:834:54)
+    at C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\q\q.js:863:30
+    at Promise.promise.promiseDispatch (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\q\q.js:796:13)
+    at C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\q\q.js:556:49
+    at runSingle (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\q\q.js:137:13)
+    at flush (C:\Users\james\Desktop\lfz\0_qa\selenium_udemy\node_modules\q\q.js:125:13)
+    </system-err>
+  
+
+  
+  </testsuite>
+</testsuites>

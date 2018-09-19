@@ -1,0 +1,29 @@
+[0807/151204.317:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/210244.458:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/210244.464:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/214229.597:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/222447.050:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/222509.596:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/222509.601:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/223109.901:ERROR:process_info.cc(380)] UncheckedAllocate
+[0807/223110.011:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.012:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.012:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.012:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.012:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:process_reader_win.cc(151)] SuspendThread: Access is denied. (0x5)
+[0807/223110.013:ERROR:exception_snapshot_win.cc(88)] thread ID 13532 not found in process
+[0807/223110.013:WARNING:crash_report_exception_handler.cc(62)] ProcessSnapshotWin::Initialize failed
+[0807/223110.033:ERROR:process_info.cc(380)] UncheckedAllocate
+[0808/133430.950:ERROR:process_info.cc(380)] UncheckedAllocate
