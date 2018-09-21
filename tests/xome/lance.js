@@ -10,12 +10,6 @@ let driver = new Builder()
     .usingServer('http://localhost:4444/wd/hub')
     .withCapabilities(webdriver.Capabilities.chrome())
     .build();
-    // .forBrowser('chrome').build();
-
-//driver.manage().window().maximize();
-// driver.manage().window().setRect({width: 640, height: 480});
-// driver.manage().window().maximize();
-
 
 driver.get( 'https://jameswww.com')
     .then( () => driver.manage().window().setRect({width: 640, height: 480}) )
