@@ -1,79 +1,36 @@
-var webdriver = require('selenium-webdriver');
-//
-// var browser = new webdriver.Builder().withCapabilities(webdriver.Capabilities.chrome()).build();
-//
-// browser.get('https://jameswww.com');
-//
-//     var promise = browser.getTitle();
-//     console.log('running');
-//     promise.then(function(title) {
-//         console.log(title)
-//     });
+// http://lance.bio/2017/09/26/javascript-selenium-newb-cheat-sheet/
+var credentials = require('../../credentials.js');
 
-//browser.quit();
+var webdriver = require('selenium-webdriver'),
+    Builder = webdriver.Builder,
+    By = webdriver.By,
+    logging = webdriver.logging,
+    until = webdriver.until;
 
-// var webdriver = require("selenium-webdriver");
-//
-// function createDriver() {
-//     var driver = new webdriver.Builder()
-//         .usingServer('http://localhost:4444/wd/hub')
-//         .withCapabilities(webdriver.Capabilities.chrome())
-//         .build();
-//     //driver.manage().timeouts().setScriptTimeout(10000);
-//     return driver;
-// }
-//
-// var driver = createDriver();
-// driver.get("https://www.yahoo.com");
-// console.log('running');
-// driver.getTitle(function (title) {
-//     console.log('title is:',title)
-// });
-// // driver.getTitle().then(function (title) {
-// //     console.log(title);
+let driver = new Builder()
+    .usingServer('http://localhost:4444/wd/hub')
+    .withCapabilities(webdriver.Capabilities.chrome())
+    .build();
 
+var winName;
 
-//driver.quit();
-var driver = new webdriver.Builder()
-        .usingServer('http://localhost:4444/wd/hub')
-        .withCapabilities(webdriver.Capabilities.chrome())
-        .build();
-//var driver = new webdriver.Builder().build();
-driver.get('https://jameswww.com/catch_me/');
-
-// var element = driver.findElement(webdriver.By.name('q'));
-// element.sendKeys('Cheese!');
-// //element.submit();
-// console.log('running before title checking');
-
-var elementNa = driver.findElement(webdriver.By.className('weather-text'));
-elementNa.getText().then(text => console.log(`Text is ${text}`)).catch( () => console.log("didn't find title"));
-
-// const webTitle = async () => {
-//     console.log(await driver.getTitle());
-//     return "done";
-// }
-
-// webTitle();
-
-driver.pause(3000);
-driver.getTitle().then((title) => {console.log('Page title is: ' + title);}).catch( () => {console.log("Didn't find page title")});
-
-// driver.wait(function() {
-//     return driver.getTitle().then(function(title) {
-//         return title.toLowerCase().lastIndexOf('cheese!', 0) === 0;
-//     });
-// }, 3000);
-//
-// driver.getTitle().then(function(title) {
-//     console.log('Page title is: ' + title);
-// });
-
-// const exitBrowser = async () => {
-//     await driver.quit();
-//     return "done";
-// }
-//
-// exitBrowser();
-// driver.close();
-// driver.quit();
+driver.get( 'https://xome.com')
+    .then( () => driver.manage().window().setRect({width: 640, height: 480}) )
+    .then( () => driver.manage().window().maximize() )
+    .then( () => driver.getWindowHandle().then( wname => winName=wname ))
+    .then( () => driver.findElement( { 'xpath' : '//*[@id="js-SiteHead"]/div/nav/div[3]/div[2]/div[2]/a[1]'} ).click())
+    .then( () => driver.switchTo().frame('login-iframe'))
+    .then( () => driver.sleep( 1000 ))
+    .then( () => driver.findElement( { 'id' : 'security_loginname' } ).sendKeys( credentials.username))
+    .then( () => driver.findElement( { 'id' : 'security_password'  } ).sendKeys( credentials.password))
+    .then( () => driver.findElement( { 'id' : 'submit-button'             } ).click() )
+    .then( () => driver.sleep( 1000 ))
+    .then( () => driver.switchTo().window(winName)).catch(()=> console.log('nope!'))
+    .then( () => driver.findElement( { 'id' : 'homepage-search-field' } ).sendKeys('Irvine, CA'))
+    .then( () => driver.findElement( { 'className' : 'search-field-button'   } ).click() )
+    .then( () => driver.sleep( 1000 ))
+    .then( () => driver.findElement( { 'id' : 'uniqid-NavSubmenu-button-14'             } ).click() )
+    .then( () => driver.sleep( 1000 ))
+    .then( () => driver.findElement( { 'xpath' : '//*[@id="uniqid-NavSubmenu-dropdown-14"]/ul/li[17]/a'} ).click() )
+    .then( () => driver.sleep( 3000 ))
+    .then( () => driver.quit() );

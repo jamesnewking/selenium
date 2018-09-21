@@ -11,6 +11,6 @@ async function main() {
 
     await element.sendKeys('webdriver', Key.RETURN)
     await driver.wait(until.titleIs('swebdriver - Google Search'), 1000).catch( () => console.log('title not found'))
-    await driver.quit()
+    await driver.quit();
 }
 main();
