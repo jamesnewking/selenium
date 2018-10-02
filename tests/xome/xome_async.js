@@ -47,7 +47,8 @@ async function xome_login(){
     await driver.findElement( { 'id' : 'homepage-search-field' } ).sendKeys('Irvine, CA');
     await driver.findElement( { 'className' : 'search-field-button'   } ).click();
     await driver.sleep( 1000 );
-    await driver.findElement( { 'id' : 'uniqid-NavSubmenu-button-14'  } ).click();
+
+    await driver.findElement( { 'id' : 'uniqid-NavSubmenu-button-14'  } ).click(); //top right login button
     await driver.sleep( 1000 );
 
     await driver.wait(until.elementLocated( { 'xpath' : '//*[@id="mapsearch-results-body"]/div'} ) );

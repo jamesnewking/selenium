@@ -22,3 +22,5 @@ to execute the test
 >install and config node:
 >./node_modules/
 
+# To run mocha/chai:
+> mocha xome_mocha.js --timeout 100000
