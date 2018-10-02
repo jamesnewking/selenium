@@ -16,3 +16,8 @@
 
 > the browsers are: chrome, edge, firefox, ie, safari
 
+#to run test with mocha/chai and selenium
+> make sure selenium server is running
+
+> mocha xome_mocha.js --timeout 100000
+

@@ -1,4 +1,5 @@
 const assert = require('assert');
+const fetch = require('node-fetch');
 const webdriver = require('selenium-webdriver'),
     Builder = webdriver.Builder,
     By = webdriver.By,
@@ -6,6 +7,7 @@ const webdriver = require('selenium-webdriver'),
     until = webdriver.until;
 //const test = require('selenium-webdriver/testing');
 const { expect } = require('chai');
+//const { should } = require('chai').should();
 var credentials = require('../../credentials.js');
 
 var driver;
@@ -25,11 +27,66 @@ describe( 'Xome smoke test', () => {
     });
 
     it('check for expected web page title',async () => {
-        //this.timeout(2000);
         let pageTitle = await driver.getTitle();
-        //await expect.equal(pageTitle, 'Xome Retail | Real Estate & Homes For Sale');
         expect(pageTitle).to.equal('Xome Retail | Real Estate & Homes For Sale' , 'Error: Title is not Xome!');
-    })
+    });
+
+
+    it('check for all img URLs', async () => {
+        let imageArr = await driver.findElements({'css': 'img'});
+        let linkArr = await driver.findElements({'css' : 'a'});
+        console.log(`number of <a> tags: ${await linkArr.length}`);
+        for (let i = 0; i < imageArr.length; i++) {
+            //console.log( await imageArr[i].getAttribute('src'));
+            let imgUrl = await imageArr[i].getAttribute('src');
+            expect(imgUrl).to.exist;
+            expect(imgUrl).to.be.a("string");
+            fetch(imgUrl)
+                .then(
+                    (response) => {
+                        if (response.status === 200) {
+                            console.log(`${i})image link to ${imgUrl} is valid`);
+                            return;
+                        }
+                    }
+                )
+                .catch(
+                    (err) => console.log('the image link has error: ', err)
+                );
+        }
+    });
+
+
+    // function get(url) {
+    //     // Return a new promise.
+    //     return new Promise(function(resolve, reject) {
+    //         // Do the usual XHR stuff
+    //         var req = new XMLHttpRequest();
+    //         req.open('GET', url);
+    //
+    //         req.onload = function() {
+    //             // This is called even on 404 etc
+    //             // so check the status
+    //             if (req.status == 200) {
+    //                 // Resolve the promise with the response text
+    //                 resolve(req.response);
+    //             }
+    //             else {
+    //                 // Otherwise reject with the status text
+    //                 // which will hopefully be a meaningful error
+    //                 reject(Error(req.statusText));
+    //             }
+    //         };
+    //
+    //         // Handle network errors
+    //         req.onerror = function() {
+    //             reject(Error("Network Error"));
+    //         };
+    //
+    //         // Make the request
+    //         req.send();
+    //     });
+    // }
 
     it(`login to Xome as ${credentials.loginName}`, async () => {
         await driver.findElement( { 'xpath' : '//*[@id="js-SiteHead"]/div/nav/div[3]/div[2]/div[2]/a[1]'} ).click();
