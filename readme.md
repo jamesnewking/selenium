@@ -23,4 +23,6 @@ to execute the test
 >./node_modules/
 
 # To run mocha/chai:
-> mocha xome_mocha.js --timeout 100000
+> mocha xome_mocha.js --timeout=100000 --chrome
+
+> the --browser feature is only for xome_mocha.js
