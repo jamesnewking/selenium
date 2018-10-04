@@ -12,26 +12,59 @@ const credentials = require('../../credentials.js');
 const xomeXpath = require('./xome_xpath');
 var driver;
 let browserToTest = process.argv[4];
+const chrome = require('selenium-webdriver/chrome');
+const firefox = require('selenium-webdriver/firefox');
+const screenSize = {
+    width: 1280,
+    height: 920
+};
 
 describe( 'Xome smoke test', () => {
     before(async () => {
         //this.timeout(2000);
         switch(browserToTest) {
             case '--edge':
-                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.edge()).build();
+                driver = await new webdriver.Builder()
+                    .usingServer('http://localhost:4444/wd/hub')
+                    .withCapabilities(webdriver.Capabilities.edge())
+                    .build();
                 browserToTest = 'edge';
                 break;
             case '--firefox':
-                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.firefox()).build();
+                driver = await new webdriver.Builder()
+                    .usingServer('http://localhost:4444/wd/hub')
+                    .withCapabilities(webdriver.Capabilities.firefox())
+                    .build();
+                browserToTest = 'firefox';
+                break;
+            case '--headlessfirefox':
+                driver = await new webdriver
+                    .Builder().usingServer('http://localhost:4444/wd/hub')
+                    .withCapabilities(webdriver.Capabilities.firefox())
+                    .setFirefoxOptions(new firefox.Options().headless().windowSize(screenSize))
+                    .build();
                 browserToTest = 'firefox';
                 break;
             case '--ie':
-                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.ie()).build();
+                driver = await new webdriver.Builder()
+                    .usingServer('http://localhost:4444/wd/hub')
+                    .withCapabilities(webdriver.Capabilities.ie())
+                    .build();
                 //driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities({'browserName':''}).build();
                 browserToTest = 'ie';
                 break;
+            case '--headlesschrome':
+                driver = await new webdriver.Builder()
+                    .usingServer('http://localhost:4444/wd/hub')
+                    .withCapabilities(webdriver.Capabilities.chrome())
+                    .setChromeOptions(new chrome.Options().headless().windowSize(screenSize))
+                    .build();
+                browserToTest = 'chrome';
             default:
-                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.chrome()).build();
+                driver = await new webdriver.Builder()
+                    .usingServer('http://localhost:4444/wd/hub')
+                    .withCapabilities(webdriver.Capabilities.chrome())
+                    .build();
                 browserToTest = 'chrome';
         }
         console.log(`Testing browser: ${browserToTest}`);

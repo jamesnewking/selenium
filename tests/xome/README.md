@@ -23,7 +23,7 @@
 
 > if there is no --firefox option, will run on chrome by default
 
-> options of browsers to test are: --chrome --firefox --edge --ie
+> options of browsers to test are: --chrome --firefox --edge --ie --headlesschrome --headlessfirefox
 
 > for edge, set the --timeout=200000 (edge is slow, need longer time to execute)
 
