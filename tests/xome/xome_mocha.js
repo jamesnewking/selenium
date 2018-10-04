@@ -8,17 +8,40 @@ const webdriver = require('selenium-webdriver'),
 //const test = require('selenium-webdriver/testing');
 const { expect } = require('chai');
 //const { should } = require('chai').should();
-var credentials = require('../../credentials.js');
-
+const credentials = require('../../credentials.js');
+const xomeXpath = require('./xome_xpath');
 var driver;
+let browserToTest = process.argv[4];
 
 describe( 'Xome smoke test', () => {
     before(async () => {
         //this.timeout(2000);
-        driver =await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.chrome()).build();
+        switch(browserToTest) {
+            case '--edge':
+                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.edge()).build();
+                browserToTest = 'edge';
+                break;
+            case '--firefox':
+                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.firefox()).build();
+                browserToTest = 'firefox';
+                break;
+            case '--ie':
+                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.ie()).build();
+                //driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities({'browserName':''}).build();
+                browserToTest = 'ie';
+                break;
+            default:
+                driver = await new webdriver.Builder().usingServer('http://localhost:4444/wd/hub').withCapabilities(webdriver.Capabilities.chrome()).build();
+                browserToTest = 'chrome';
+        }
+        console.log(`Testing browser: ${browserToTest}`);
         await driver.get('https://www.xome.com');
-        //await driver.manage().window().maximize();
-        await driver.manage().window().setRect( {width: 1280, height: 920});
+
+        if (browserToTest === 'edge'){
+            await driver.manage().window().maximize();
+        } else {
+            await driver.manage().window().setRect( {width: 1280, height: 920});
+        };
     } );
 
     after(async () => {
@@ -26,84 +49,78 @@ describe( 'Xome smoke test', () => {
 
     });
 
-    it('check for expected web page title',async () => {
-        let pageTitle = await driver.getTitle();
-        expect(pageTitle).to.equal('Xome Retail | Real Estate & Homes For Sale' , 'Error: Title is not Xome!');
-    });
-
-
-    it('check for all img URLs', async () => {
-        let imageArr = await driver.findElements({'css': 'img'});
-        let linkArr = await driver.findElements({'css' : 'a'});
-        console.log(`number of <a> tags: ${await linkArr.length}`);
-        for (let i = 0; i < imageArr.length; i++) {
-            //console.log( await imageArr[i].getAttribute('src'));
-            let imgUrl = await imageArr[i].getAttribute('src');
-            expect(imgUrl).to.exist;
-            expect(imgUrl).to.be.a("string");
-            fetch(imgUrl)
-                .then(
-                    (response) => {
-                        if (response.status === 200) {
-                            console.log(`${i})image link to ${imgUrl} is valid`);
-                            return;
-                        }
-                    }
-                )
-                .catch(
-                    (err) => console.log('the image link has error: ', err)
-                );
-        }
-    });
-
-
-    // function get(url) {
-    //     // Return a new promise.
-    //     return new Promise(function(resolve, reject) {
-    //         // Do the usual XHR stuff
-    //         var req = new XMLHttpRequest();
-    //         req.open('GET', url);
+      // it(`hover mouse over auctions`, async () => {
+    //     let auctionsToptab = await driver.findElement({'xpath': xomeXpath.auctionsToptab});
+    //     let searchAuctions = await driver.findElement({'xpath': xomeXpath.searchAuctions});
+    //     let allHomes       = await driver.findElement({'xpath': xomeXpath.allHomes});
     //
-    //         req.onload = function() {
-    //             // This is called even on 404 etc
-    //             // so check the status
-    //             if (req.status == 200) {
-    //                 // Resolve the promise with the response text
-    //                 resolve(req.response);
-    //             }
-    //             else {
-    //                 // Otherwise reject with the status text
-    //                 // which will hopefully be a meaningful error
-    //                 reject(Error(req.statusText));
-    //             }
-    //         };
+    //     const actions = driver.actions({bridge:true});
+    //     await actions.move({duration:1500,origin:auctionsToptab,x:0,y:0}).perform();
+    //     await actions.move({duration:1500,origin:searchAuctions,x:0,y:0}).perform();
+    //     await actions.move({duration:1500,origin:allHomes,x:0,y:0}).perform();
+    //     await allHomes.click();
+    // });
     //
-    //         // Handle network errors
-    //         req.onerror = function() {
-    //             reject(Error("Network Error"));
-    //         };
+    // it('back to main Xome page', async () => {
+    //     await driver.findElement({'xpath': xomeXpath.mainLogo}).click();
+    //     await driver.wait(until.elementLocated({'xpath': xomeXpath.mainSlogan}));
+    //     const mainSlogan = await driver.findElement({'xpath': xomeXpath.mainSlogan}).getText();
+    //     //console.log(`Main page slogan is: ${mainSlogan}`);
+    //     expect(mainSlogan).to.equal(xomeXpath.text.textSlogan,'Error: slogan does not match');
+    // });
     //
-    //         // Make the request
-    //         req.send();
-    //     });
-    // }
+    // it('all img URLs are valid links, returns server code 200', async () => {
+    //     let imageArr = await driver.findElements({'css': 'img'});
+    //     let linkArr = await driver.findElements({'css' : 'a'});
+    //     console.log(`number of <a> tags: ${await linkArr.length}`);
+    //     for (let i = 0; i < imageArr.length; i++) {
+    //         //console.log( await imageArr[i].getAttribute('src'));
+    //         let imgUrl = await imageArr[i].getAttribute('src');
+    //         expect(imgUrl).to.exist;
+    //         expect(imgUrl).to.be.a("string");
+    //         fetch(imgUrl)
+    //             .then(
+    //                 (response) => {
+    //                     if (response.status === 200) {
+    //                         console.log(`${i})image link to ${imgUrl} is valid`);
+    //                         return;
+    //                     }
+    //                 }
+    //             )
+    //             .catch(
+    //                 (err) => console.log('the image link has error: ', err)
+    //             );
+    //     }
+    // });
+
+    it(`testing webpage title: ${xomeXpath.text.mainPageTitle}`, async () => {
+        const websiteTitle = await driver.getTitle();
+        expect(websiteTitle).to.equal(xomeXpath.text.mainPageTitle, 'Error: main webpage title does not match')
+
+    })
 
     it(`login to Xome as ${credentials.loginName}`, async () => {
-        await driver.findElement( { 'xpath' : '//*[@id="js-SiteHead"]/div/nav/div[3]/div[2]/div[2]/a[1]'} ).click();
-
+        await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));//for ie
+        await driver.wait(until.elementLocated( { 'xpath' : xomeXpath.signIn } ) );//for ie
+        await driver.findElement( { 'xpath' : xomeXpath.signIn } ).click();
 
         let loginFrame = await driver.findElement(By.id('login-iframe'));
         await driver.switchTo().frame(loginFrame).catch( ()=> console.log('did not switch to active element') );
         await driver.sleep( 1500 );
         await driver.findElement( { 'id' : 'security_loginname' } ).sendKeys( credentials.username).catch( () => console.log('could not find element security_loginname'));
+        if (browserToTest==='edge'){
+            await driver.sleep(1500);
+        };
         await driver.findElement( { 'id' : 'security_password'  } ).sendKeys( credentials.password).catch( () => console.log('could not find element security_password'));
         await driver.findElement( { 'id' : 'submit-button'      } ).click();
-        await driver.sleep( 1000 );
+        await driver.sleep( 1500 );
     })
 
     it('verify the login name is correct', async () => {
-        let loginName = await driver.findElement({ 'xpath': '//*[@id="uniqid-NavSubmenu-button-14"]/span/span'}).getText();
-        expect(loginName).to.equal(credentials.loginName, 'Error: login name does not match');
+        await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));//need this for firefox
+        await driver.wait(until.elementLocated( { 'xpath' : xomeXpath.loginName } ) );
+        let loginName = await driver.findElement({ 'xpath': xomeXpath.loginName }).getText();
+        expect(loginName.toUpperCase()).to.equal(credentials.loginName, 'Error: login name does not match');
     })
 
     it(`search homes in ${credentials.city}`, async () => {
@@ -112,79 +129,67 @@ describe( 'Xome smoke test', () => {
         await driver.findElement( { 'className' : 'search-field-button'   } ).click();
         await driver.sleep( 1000 );
         ////*[@id="location-criteria-list"]/ul/li/a
-        let cityName = await driver.findElement( { 'xpath': '//*[@id="location-criteria-list"]/ul/li/a'}).getText();
+        if( browserToTest==='edge' ){
+            await driver.wait(until.elementLocated( { 'xpath' : xomeXpath.cityName } ) );
+        };
+        let cityName = await driver.findElement( { 'xpath': xomeXpath.cityName }).getText();
         expect(cityName).to.equal(credentials.cityName, 'Error: city name does not match');
-
-        // await driver.findElement( { 'id' : 'uniqid-NavSubmenu-button-14'  } ).click();
-        // await driver.sleep( 1000 );
-
 
     })
 
     it(`verify the number of properties on the page`, async () => {
-        await driver.wait(until.elementLocated( { 'xpath' : '//*[@id="mapsearch-results-body"]/div'} ) );
-        let properties = await driver.findElements( { 'xpath' : '//*[@id="mapsearch-results-body"]/div' } );
+        await driver.wait(until.elementLocated( { 'xpath' : xomeXpath.firstPropImg } ) );
+        let properties = await driver.findElements( { 'xpath' : xomeXpath.firstPropImg } );
         console.log(`Number of properties on the page: ${properties.length}`);
         expect(properties.length).to.equal(24, 'Error: number of properties on the page is not 24');
     })
 
     it(`click through the pictures on each of the properties`, async () => {
-        let properties = await driver.findElements( { 'xpath' : '//*[@id="mapsearch-results-body"]/div' } );
-        // let topContact = await driver.findElement({'xpath': `//div[6]/div/div/nav/div[3]/div[2]/div[1]/div[1]/span`});
-        // const actions = driver.actions({bridge:true});
-        // await actions.move({duration:500,origin:topContact,x:0,y:0}).perform();
-        // console.log('moved mouse?');
+        let properties = await driver.findElements( { 'xpath' : xomeXpath.firstPropImg } );
 
-        // await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
-        // await driver.sleep( 1000 );
-        let driverCapa = await driver.getCapabilities();
-        var browserName = driverCapa.getBrowserName();
-        //console.log('browser is: ', browserName);
-
-        if( browserName==='chrome' || browserName==='MicrosoftEdge') {
+        if( browserToTest !== 'firefox' ) {
             for (let pInPage = 1; pInPage <= properties.length; pInPage++) {
-                //await driver.wait(until.elementLocated( {'xpath' : `//*[@id="mapsearch-results-body"]/div[${pInPage}]/div[2]/a` }));
                 await driver.sleep(1500);
-                await driver.findElement({'xpath': `//*[@id="mapsearch-results-body"]/div[${pInPage}]`}).click();//click on the property listed
                 await driver.findElement({'xpath': `//*[@id="mapsearch-results-body"]/div[${pInPage}]`}).catch(() => console.log(`can not find the ${pInPage}th property!`));//click on the first property listed
-                //console.log(`div[${pInPage}]`);
-                //*[@id="mapsearch-results-body"]/div[2]//second property
-                await driver.wait(until.elementLocated({'xpath': '//*[@id="ltslide-total"]'}));
+                await driver.findElement({'xpath': `//*[@id="mapsearch-results-body"]/div[${pInPage}]`}).click();//click on the property listed
+                await driver.wait(until.elementLocated({'xpath': xomeXpath.picTotal }));//make sure this is correct
                 await driver.sleep(1000);
-                let picTotal = await driver.findElement({'xpath': '//*[@id="ltslide-total"]'}).getText();//number of property pictures
-                let streetAddr = await driver.findElement({'xpath': '//*[@id="listingdetail-title-summary"]/div[2]/div/h1'}).getText();//street address
-                let cityAddr = await driver.findElement({'xpath': '//*[@id="listingdetail-title-summary"]/div[2]/div/div/span[1]'}).getText();//city address
-                let askingPrice = await driver.findElement({'xpath': '//*[@id="listingdetail-title-summary"]/div[1]/div[2]/span[1]/span/span'}).getText();//property asking price
+                let picTotal = await driver.findElement({'xpath': xomeXpath.picTotal }).getText();//number of property pictures
+                if (picTotal === ''){
+                    picTotal = 'no'; //in case of no pictures shown
+                };
+                let streetAddr  = await driver.findElement({'xpath': xomeXpath.streetAddr  }).getText();//street address
+                let cityAddr    = await driver.findElement({'xpath': xomeXpath.cityAddr    }).getText();//city address
+                let askingPrice = await driver.findElement({'xpath': xomeXpath.askingPrice }).getText();//property asking price
+                expect(cityAddr).to.equal(xomeXpath.text.cityText, `Error: City name does not match ${xomeXpath.cityText}`);
                 console.log(`The property at ${streetAddr} ${cityAddr} has asking price of ${askingPrice} with ${picTotal} property pictures`);
                 if (picTotal > 1) {
                     for (let i = 0; i < picTotal; i++) {
-                        if (browserName==='MicrosoftEdge'){
+                        if (browserToTest==='edge'){
                             await driver.sleep(1500);
                         };
-                        await driver.findElement({'xpath': '//*[@id="gallery-photos-all"]/div/div/div/a[2]'}).click().catch(() => console.log('nope, could not find next pic >'));
+                        await driver.findElement({'xpath': xomeXpath.nextPic }).click().catch(() => console.log('nope, could not find next pic >'));
                         if (i > 3) {
                             i = picTotal;//So we don't click through all of the pictures, because there could be a lot of pictures!
                         }
                     }
-                    //await driver.findElement( { 'xpath' : '//*[@id="gallery-photos-all"]/div/div/div/a[2]/i'    } ).click();//next picture >
-                }
-                ;
-                await driver.findElement({'xpath': '//*[@id="top-navigation-v3-closer"]/span'}).click();//close modal
+                };
+                await driver.findElement({'xpath': xomeXpath.closeModal }).click();//close modal
                 if (pInPage > 5) {
                     pInPage = properties.length;//so we don't click through all of the properties
                 }
             }
         }
-
-
     })
 
-    it('logout of Xome', async () => {
-        await driver.wait(until.elementLocated({ 'xpath': '//*[@id="uniqid-NavSubmenu-dropdown-14"]'} ));//menu dropdown
-        await driver.findElement( { 'id' : 'uniqid-NavSubmenu-button-14'  } ).click();
-        await driver.sleep ( 2500 );
-        await driver.findElement( { 'xpath' : '//*[@id="uniqid-NavSubmenu-dropdown-14"]/ul/li[17]/a'} ).click();//logout
-    })
-
+    if (browserToTest !== '--edge') { //edge bug where can not click on logout because out of viewable screen
+        it('logout of Xome', async () => {
+            await driver.switchTo().defaultContent().catch(() => console.log('can not find defaultContent window'));//for Edge
+            await driver.wait(until.elementLocated({'xpath': xomeXpath.menuDropDown}));//menu dropdown
+            await driver.findElement({'id': xomeXpath.navMenuButton}).click();
+            await driver.sleep(1500);
+            await driver.findElement({'xpath': xomeXpath.userLogout}).click();//logout; edge can not see the userLogout
+        })
+    }
 });
 
