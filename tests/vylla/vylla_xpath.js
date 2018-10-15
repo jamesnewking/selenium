@@ -28,5 +28,7 @@ module.exports = {
     resultsIndividualPrice: { 'xpath': '/html/body/div[3]/div[2]/div[2]/div/div/div/div[1]/div/span[1]'},
     resultsNumOfPictures: { 'xpath': '//*[@id="gallery-1"]/div[5]'},
     resultsNextPicture: { 'xpath': '/html/body/div[2]/div/div[2]'},
+    //resultsActivePicture: { 'className': 'rsSlide  rsActiveSlide'},
+    resultsActivePicture: { 'xpath': '//div[@class="rsSlide  rsActiveSlide"]/img'},
 
 }
