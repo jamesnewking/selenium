@@ -80,18 +80,18 @@ describe( 'Vylla smoke test', () => {
         };
     } );
 
-    // after(async () => {
-    //     await driver.quit();
-    //
-    // });
+    after(async () => {
+        await driver.quit();
 
-    it(`testing webpage title: ${vyllaXpath.text.mainPageTitle}`, async () => {
+    });
+
+    it(`Test case 1) testing webpage title: ${vyllaXpath.text.mainPageTitle}`, async () => {
         const websiteTitle = await driver.getTitle();
         expect(websiteTitle).to.equal(vyllaXpath.text.mainPageTitle, 'Error: main webpage title does not match')
 
     })
 
-    it('all img URLs are valid links, returns server code 200', async () => {
+    it('Test case 2) all img URLs are valid links, returns server code 200', async () => {
             let imageArr = await driver.findElements({'css': 'img'});
             let linkArr = await driver.findElements({'css' : 'a'});
             console.log(`number of <img> tags: ${await imageArr.length}`);
@@ -99,7 +99,6 @@ describe( 'Vylla smoke test', () => {
             await driver.executeScript( "window.scrollTo(0,3000);" );
             await driver.executeScript( "window.scrollTo(0,-3000);" );
             for (let i = 0; i < imageArr.length; i++) {
-                console.log( await imageArr[i].getAttribute('src'));
                 let imgUrl;
                 try {
                     imgUrl = await imageArr[i].getAttribute('src');
@@ -110,19 +109,12 @@ describe( 'Vylla smoke test', () => {
                 }
 
                 if (imgUrl == null){
-                    console.log(`this imgUrl #${i} is null!`);
+                    //console.log(`this imgUrl #${i} is null!`);
                     continue;
                 }
 
-                // try {
-                //     expect(imgUrl).to.exist;
-                // }
-                // catch(err) {
-                //     console.log(`this imgUrl: does not exist`);
-                //     continue;
-                // }
                 expect(imgUrl).to.be.a("string");//.catch(() => console.log(`this imgUrl: ${imgUrl} is not a string`));
-                console.log(`${i}) `,imgUrl);
+                //console.log(`${i}) `,imgUrl);
                 fetch(imgUrl)
                     .then(
                         (response) => {
@@ -139,19 +131,14 @@ describe( 'Vylla smoke test', () => {
         });
 
 
-    it(`login to Vylla as ${credentials.loginName}`, async () => {
-        //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));//for ie
-        //await driver.sleep(1000);
+    it(`Test case 3) login to Vylla as ${credentials.loginName}`, async () => {
+
         let sign_in = await driver.findElement( vyllaXpath.signIn  );
         console.log('found signin element!');
-        // const actions = driver.actions({bridge:true});
-        // await actions.move({duration:1500,origin:sign_in,x:0,y:0}).perform();
-        // console.log('moving mouse');
+
         await sign_in.click();
 
-        //let loginFrame = await driver.findElement(By.id('login-iframe'));
-        //await driver.switchTo().frame(loginFrame).catch( ()=> console.log('did not switch to active element') );
-        await driver.wait(until.elementLocated( vyllaXpath.signInButton ));
+        await driver.wait(until.elementLocated( vyllaXpath.signInButton ),3000);
 
         await driver.findElement( vyllaXpath.input_email ).sendKeys( credentials.username).catch( () => console.log('could not find element security_loginname'));
         if (browserToTest==='edge'){
@@ -159,42 +146,28 @@ describe( 'Vylla smoke test', () => {
         };
         await driver.findElement( vyllaXpath.input_password ).sendKeys( credentials.password).catch( () => console.log('could not find element security_password'));
         // await driver.executeScript( "window.scrollTo(0,300);" );
-        // var numIframes = await driver.findElements(By.css("iframe"));
-        // console.log('number of iframes: ${numIframes.length}', numIframes.length);
-        // //await driver.switchTo().frame(driver.findElement(By.css("iframe")));
-        // for (let i=0;i<numIframes.length;i++){
-        //     await driver.sleep(1500);
-        //     if (i===1){i++};
-        //     console.log("frame: ", i);
-        //     await driver.switchTo().frame(i);
-        //     await driver.findElement( { 'xpath': honestXpath.captcha}).click().catch( () => console.log("didn't find captcha!") );
-        // }
-        // //await driver.switchTo().frame(6);//0,1,2,3,4,5
-        // //await driver.findElement( { 'xpath': honestXpath.captcha}).click().catch( () => console.log("didn't find captcha!") );
-        // await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
+
         await driver.findElement( vyllaXpath.signInButton ).click().catch( () => console.log("did't find submit button!", i) );
-        await driver.wait(until.elementLocated( vyllaXpath.myVyllaTitleXpath ));
-        //await driver.sleep(2500);
+        await driver.wait(until.elementLocated( vyllaXpath.myVyllaTitleXpath ), 6000);
         //debug
         //await driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         //await driver.manage().timeouts().pageLoadTimeout(3000);
         let myVyllaTitle = await driver.findElement( vyllaXpath.myVyllaTitleXpath ).getText();
         let logInUserName = await driver.findElement( vyllaXpath.signedInUser ).getText();
         expect(myVyllaTitle).to.equal( vyllaXpath.myVyllaTitleName, 'error: myVylla title did not match' );
-        expect(logInUserName).to.equal( credentials.loginName, 'error: user login name did not match');
+        expect(logInUserName.toUpperCase()).to.equal( credentials.loginName.toUpperCase(), 'error: user login name did not match');
 
     })
 
-    it(`search for homes in ${credentials.city}`, async () => {
-        await driver.sleep(5000);
+    it(`Test case 4) search for homes in ${credentials.city}`, async () => {
+        await driver.wait(until.elementLocated( vyllaXpath.myVyllaNavHomes ), 6000);
         //await driver.wait(until.elementLocated( vyllaXpath.myVyllaTitleXpath ));
         await driver.findElement( vyllaXpath.myVyllaNavHomes).click();
-        //await driver.wait(until.elementLocated( vyllaXpath.input_city) );
+        await driver.wait(until.elementLocated( vyllaXpath.input_city ),5000);
         await driver.findElement( vyllaXpath.input_city ).sendKeys(credentials.city);
         const actions = driver.actions({bridge:true});
         await actions.sendKeys(webdriver.Key.ENTER).perform();
-        await driver.wait(until.elementLocated( vyllaXpath.display_cityName));
-        await driver.sleep(2500);
+        await driver.wait(until.elementLocated( vyllaXpath.display_cityName),3000);
         let displayedCityName = await driver.findElement( vyllaXpath.display_cityName ).getText();
         let propertiesFound = await driver.findElement( vyllaXpath.display_propertiesFound).getText();
         displayedCityName = displayedCityName.slice(3);//to remove 'in '
@@ -202,13 +175,19 @@ describe( 'Vylla smoke test', () => {
         expect(displayedCityName).to.equal(credentials.city);
     })
 
-    it(`click on first property`, async () => {
-        await driver.sleep(2500);
+    it(`Test case 5) click on first property`, async () => {
+        if (browserToTest==='edge'){
+            await driver.sleep(6500);
+        };
+        await driver.wait(until.elementLocated(vyllaXpath.resultsFirstPropertyAddr), 4000);
         let firstPropertyAddr = await driver.findElement( vyllaXpath.resultsFirstPropertyAddr).getText();
         let firstPropertyPrice = await driver.findElement( vyllaXpath.resultsFirstPropertyPrice).getText();
         console.log(`the property at ${firstPropertyAddr} is asking ${firstPropertyPrice}`);
         await driver.findElement( vyllaXpath.resultsFirstProperty ).click();
-        await driver.sleep(2500);
+        if (browserToTest==='edge'){
+            await driver.sleep(4500);
+        };
+        await driver.wait(until.elementLocated( vyllaXpath.resultsIndividualAddr ), 3000);
         //console.log(`The property on ${firstPropertyAddr} is asking ${firstPropertyPrice}`);
         let individualAddr = await driver.findElement( vyllaXpath.resultsIndividualAddr).getText();
         let individualPrice = await driver.findElement( vyllaXpath.resultsIndividualPrice).getText();
@@ -221,22 +200,38 @@ describe( 'Vylla smoke test', () => {
         let numOfPictures = await driver.findElement( vyllaXpath.resultsNumOfPictures ).getText().catch( () => {
             hasPictures = false;
             console.log('no pictures for this property');} );
+        if (browserToTest==='edge'){
+            hasPictures = false;
+        };
+
         if (hasPictures) {
             let pictureIndex = numOfPictures.indexOf('OF');
             numOfPictures = parseInt(numOfPictures.slice(pictureIndex + 3));
-            console.log(`number of pictures is:${numOfPictures}`);
-            for (let i = 0; i < numOfPictures; i++) {
-                await driver.sleep(500);
-                await driver.findElement(vyllaXpath.resultsNextPicture).click();
+            console.log(`number of pictures is: ${numOfPictures}`);
+            if (numOfPictures>1) {
+                for (let i = 0; i < numOfPictures; i++) {
+                    await driver.sleep(1000);
+                    let activePicture = await driver.findElement(vyllaXpath.resultsActivePicture);
+                    //let activeImg = await activePicture.findElement({'xpath':'//img'});
+                    let activeImgUrl = await activePicture.getAttribute("src");//debug
+                    console.log(`Pic URL is: ${activeImgUrl}`);
+                    await driver.findElement(vyllaXpath.resultsNextPicture).click();
+                }
             }
         };
         expect(firstPropertyAddr).to.equal(individualAddr);
         expect(firstPropertyPrice).to.equal(individualPrice);
     });
 
-    it(`logout ${credentials.loginName}`, async () => {
+    it(`Test case 6) logout ${credentials.loginName}`, async () => {
         await driver.findElement( vyllaXpath.signedInUser).click();
+        if (browserToTest==='edge'){
+            await driver.sleep(4500);
+        };
         await driver.findElement( vyllaXpath.signOutLink).click();
+        if (browserToTest==='edge'){
+            await driver.sleep(4500);
+        };
         let signedOutName = await driver.findElement( vyllaXpath.signedInUser).getText();
         expect(signedOutName.toUpperCase()).to.equal(vyllaXpath.signedOutUserText.toUpperCase());
     })
