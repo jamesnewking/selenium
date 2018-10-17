@@ -1,4 +1,4 @@
-# Smoke test of Honest.com using JS/Selenium/Mocha/Chai and Page Object Model
+# Smoke test of Honest.com using JS/Selenium/Mocha/Chai
 
 
 ## Before starting a selenium test

@@ -1,5 +1,7 @@
 node_modules/
 credentials.js
+honest_cred.js
+vylla_cred.js
 **/.idea/workspace.xml
 **/.idea/tasks.xml
 **/.idea/dictionaries
