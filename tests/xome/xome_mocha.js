@@ -44,6 +44,7 @@ describe( 'Xome smoke test', () => {
                     .setFirefoxOptions(new firefox.Options().headless().windowSize(screenSize))
                     .build();
                 browserToTest = 'firefox';
+                console.log('headless FireFox mode');
                 break;
             case '--ie':
                 driver = await new webdriver.Builder()
@@ -60,6 +61,8 @@ describe( 'Xome smoke test', () => {
                     .setChromeOptions(new chrome.Options().headless().windowSize(screenSize))
                     .build();
                 browserToTest = 'chrome';
+                console.log('headless Chrome mode');
+                break;
             default:
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')

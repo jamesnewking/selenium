@@ -69,9 +69,11 @@ describe( 'Vylla smoke test', () => {
                     .withCapabilities(webdriver.Capabilities.chrome())
                     .build();
                 browserToTest = 'chrome';
+
         }
         console.log(`Testing browser: ${browserToTest}`);
         await driver.get( vyllaXpath.url );
+        await driver.manage().setTimeouts({implicit:10000});
 
         if (browserToTest === 'edge'){
             await driver.manage().window().maximize();
@@ -138,7 +140,7 @@ describe( 'Vylla smoke test', () => {
 
         await sign_in.click();
 
-        await driver.wait(until.elementLocated( vyllaXpath.signInButton ),3000);
+        //await driver.wait(until.elementLocated( vyllaXpath.signInButton ),3000);
 
         await driver.findElement( vyllaXpath.input_email ).sendKeys( credentials.username).catch( () => console.log('could not find element security_loginname'));
         if (browserToTest==='edge'){
@@ -148,11 +150,11 @@ describe( 'Vylla smoke test', () => {
         // await driver.executeScript( "window.scrollTo(0,300);" );
 
         await driver.findElement( vyllaXpath.signInButton ).click().catch( () => console.log("did't find submit button!", i) );
-        await driver.wait(until.elementLocated( vyllaXpath.myVyllaTitleXpath ), 6000);
+        await driver.wait(until.elementLocated( vyllaXpath.myVyllaTitleXpath ), 3000).catch( () => console.log('could not find element myVyllaTitleXpath'));
         //debug
         //await driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         //await driver.manage().timeouts().pageLoadTimeout(3000);
-        let myVyllaTitle = await driver.findElement( vyllaXpath.myVyllaTitleXpath ).getText();
+        let myVyllaTitle = await driver.findElement( vyllaXpath.myVyllaTitleXpath ).getText().catch( () => console.log('could not find element myVyllaTitleXpath text'));
         let logInUserName = await driver.findElement( vyllaXpath.signedInUser ).getText();
         expect(myVyllaTitle).to.equal( vyllaXpath.myVyllaTitleName, 'error: myVylla title did not match' );
         expect(logInUserName.toUpperCase()).to.equal( credentials.loginName.toUpperCase(), 'error: user login name did not match');
@@ -160,13 +162,14 @@ describe( 'Vylla smoke test', () => {
     })
 
     it(`Test case 4) search for homes in ${credentials.city}`, async () => {
-        await driver.wait(until.elementLocated( vyllaXpath.myVyllaNavHomes ), 6000);
+        await driver.wait(until.elementLocated( vyllaXpath.myVyllaNavHomes ), 1000).catch( ()=> console.log(`Did not find myVyllaNavHomes`) );//debug wait
         //await driver.wait(until.elementLocated( vyllaXpath.myVyllaTitleXpath ));
         await driver.findElement( vyllaXpath.myVyllaNavHomes).click();
-        await driver.wait(until.elementLocated( vyllaXpath.input_city ),5000);
+        await driver.wait(until.elementLocated( vyllaXpath.input_city ),1000).catch( ()=> console.log(`Did not find city`) ) ;//debug wait
         await driver.findElement( vyllaXpath.input_city ).sendKeys(credentials.city);
         const actions = driver.actions({bridge:true});
         await actions.sendKeys(webdriver.Key.ENTER).perform();
+        await driver.sleep(3000);
         await driver.wait(until.elementLocated( vyllaXpath.display_cityName),3000);
         let displayedCityName = await driver.findElement( vyllaXpath.display_cityName ).getText();
         let propertiesFound = await driver.findElement( vyllaXpath.display_propertiesFound).getText();
@@ -214,7 +217,7 @@ describe( 'Vylla smoke test', () => {
                     let activePicture = await driver.findElement(vyllaXpath.resultsActivePicture);
                     //let activeImg = await activePicture.findElement({'xpath':'//img'});
                     let activeImgUrl = await activePicture.getAttribute("src");//debug
-                    console.log(`Pic URL is: ${activeImgUrl}`);
+                    console.log(`${i+1})Pic URL is: ${activeImgUrl}`);
                     await driver.findElement(vyllaXpath.resultsNextPicture).click();
                 }
             }

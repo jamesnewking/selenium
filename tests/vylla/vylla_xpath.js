@@ -9,7 +9,8 @@ module.exports = {
     input_email: { 'xpath' : '//*[@id="UserName"]' },
     input_password: { 'xpath' : '//*[@id="Password"]' },
 
-    myVyllaTitleXpath: { 'xpath' : '/html/body/div[2]/div/div/h2' },
+    //myVyllaTitleXpath: { 'xpath' : '/html/body/div[2]/div/div/h2' },
+    myVyllaTitleXpath: { 'xpath' : '//body/div[2]/div/div/h2' },
     myVyllaTitleName: 'My Vylla',
 
     signedInUser: { 'xpath' : '//*[@id="header"]/header/div/div[1]/a/span[1]/span' },
@@ -28,7 +29,6 @@ module.exports = {
     resultsIndividualPrice: { 'xpath': '/html/body/div[3]/div[2]/div[2]/div/div/div/div[1]/div/span[1]'},
     resultsNumOfPictures: { 'xpath': '//*[@id="gallery-1"]/div[5]'},
     resultsNextPicture: { 'xpath': '/html/body/div[2]/div/div[2]'},
-    //resultsActivePicture: { 'className': 'rsSlide  rsActiveSlide'},
     resultsActivePicture: { 'xpath': '//div[@class="rsSlide  rsActiveSlide"]/img'},
 
 }

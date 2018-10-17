@@ -1,6 +1,6 @@
-#Selenium Nightwatch on JS
+# Selenium Nightwatch on JS
 
-#basic demo environment
+# basic demo environment
 
 '''./tests/
 is where the tests are
