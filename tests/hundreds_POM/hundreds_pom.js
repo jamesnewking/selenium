@@ -80,12 +80,12 @@ describe( 'The Hundreds smoke test', () => {
         };
     } );
 
-    after(async () => {
-        endTime = new Date();
-        console.log(`Ending test at ${endTime}`);
-        console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
-        await driver.quit();
-    });
+    // after(async () => {
+    //     endTime = new Date();
+    //     console.log(`Ending test at ${endTime}`);
+    //     console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
+    //     await driver.quit();
+    // });
 
     it(`(1) testing webpage title`, async () => {
         let webTitle = new title(driver);
@@ -164,7 +164,8 @@ describe( 'The Hundreds smoke test', () => {
             await driver.wait(until.elementLocated( hundPath.topNavShop )).isDisplayed();
             await driver.findElement( hundPath.topNavShop ).click();
         } else {
-        await driver.findElement( hundPath.topNavBarShop ).click();    
+        await driver.findElement( hundPath.topNavBarShop ).click(); 
+        console.log('No hamburger');   
         }
         
     });
@@ -182,12 +183,12 @@ describe( 'The Hundreds smoke test', () => {
 
         let finalCart = await shopItem.getFinalCartInfo();
         const { payCartTitle, payCartPrice, payCartColor, payCartSize} = finalCart;
-        expect( gridItemTitle.trim()).to.equal(singleTitle.trim(),'Error: product name does not match!');
-        expect( gridItemTitle.trim()).to.equal(payCartTitle.trim(),'Error: product name does not match!');
-        expect( gridItemPrice.trim()).to.equal(singlePrice.trim(),'Error: product price does not match!');
-        expect( gridItemPrice.trim()).to.equal(payCartPrice.trim(),'Error: product price does not match!');
-        expect( singleColor.trim()).to.equal(payCartColor.trim(),'Error: product color does not match!');
-        expect( singleSize.slice(0,1)).to.equal(payCartSize.trim(),'Error: product size does not match!');
+        expect( gridItemTitle.trim() ).to.equal(singleTitle.trim()  ,'Error: product name does not match!');
+        expect( gridItemTitle.trim() ).to.equal(payCartTitle.trim() ,'Error: product name does not match!');
+        expect( gridItemPrice.trim() ).to.equal(singlePrice.trim()  ,'Error: product price does not match!');
+        expect( gridItemPrice.trim() ).to.equal(payCartPrice.trim() ,'Error: product price does not match!');
+        expect( singleColor.trim()   ).to.equal(payCartColor.trim() ,'Error: product color does not match!');
+        expect( singleSize.trim()    ).to.equal(payCartSize.trim()  ,'Error: product size does not match!');
     });
 
 
