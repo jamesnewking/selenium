@@ -17,6 +17,7 @@ const screenSize = {
 const hundPath = require('./hundreds_pom_path');
 const title = require("./pom_title");
 const shopitem = require("./pom_shopitem");
+let startTime, endTime;
 
 
 describe( 'The Hundreds smoke test', () => {
@@ -65,6 +66,8 @@ describe( 'The Hundreds smoke test', () => {
                     .setChromeOptions(options)
                     .build();
         }
+        startTime = new Date();
+        console.log(`Starting test at ${startTime}`);
         browserToTest = browserToTest.slice(2);
         console.log(`Testing browser: ${browserToTest}`);
         await driver.get('https://thehundreds.com/');
@@ -78,8 +81,10 @@ describe( 'The Hundreds smoke test', () => {
     } );
 
     after(async () => {
+        endTime = new Date();
+        console.log(`Ending test at ${endTime}`);
+        console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
         await driver.quit();
-
     });
 
     it(`(1) testing webpage title`, async () => {
@@ -134,7 +139,10 @@ describe( 'The Hundreds smoke test', () => {
                         }
                     )
                     .catch(
-                        (err) => console.log('the image link has error: ', err)
+                        (err) => {
+                            console.log('the image link has error: ', err);
+                            badPictureLink = true;
+                        }
                     );
 
             }
@@ -148,16 +156,17 @@ describe( 'The Hundreds smoke test', () => {
 
 
     it('(3) click shop on Nav', async () => {
-        if(browserToTest==='edge'){
-            console.log('edge');
-            await driver.findElement( hundPath.edgeTopNavShop ).click();
-        } else {
+        
+        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 1000 )).isDisplayed();
+        console.log(`hamburger? ${await hamburgerIsVisible}`);
+        if ( hamburgerIsVisible ) {
             await driver.findElement( hundPath.topNavHamburger ).click();
-            //await driver.findElement( hundPath.topNavHamburger ).click();
-            //await driver.findElement( hundPath.topNavHamburger ).click();
             await driver.wait(until.elementLocated( hundPath.topNavShop )).isDisplayed();
             await driver.findElement( hundPath.topNavShop ).click();
+        } else {
+        await driver.findElement( hundPath.topNavBarShop ).click();    
         }
+        
     });
 
     it('(4) add item to cart, verify product in cart', async () => {
