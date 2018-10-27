@@ -9,7 +9,24 @@ module.exports = class ShopItem {
         this.singleItemTitle = { 'css' : '#PageContainer > main > div > div > div > div.clearfix.quickview-content > div.grid__item.main-info.animate.slide-left.animated > h1'},
         this.singleItemPrice = { 'css' : '#ProductPrice > span '},
         this.singleItemColor = { 'css' : '#AddToCartForm > div.swatch-panda.clearfix > div.panda-header > span'},
+        
+        this.singleItem1stColor = { 'xpath' : '//*[@id="AddToCartForm"]/div[3]/div[2]'},
+        this.singleItme2ndColor = { 'xpath' : '//*[@id="AddToCartForm"]/div[3]/div[3]'},
+       
+        this.singleItemSizeS   = { 'css' : '#AddToCartForm > ul > li:nth-child(1) '},
+        this.singleItemSizeM   = { 'css' : '#AddToCartForm > ul > li:nth-child(2) '},
+        this.singleItemSizeL   = { 'css' : '#AddToCartForm > ul > li:nth-child(3) '},
+        this.singleItemSizeXL  = { 'css' : '#AddToCartForm > ul > li:nth-child(4) '},
+        this.singleItemSizeXXL = { 'css' : '#AddToCartForm > ul > li:nth-child(5) '},
+
         this.singleItemSize = { 'css' : '#AddToCartForm > div.sizes-header > span'},
+        this.sizeMap = {
+            'Small':'S',
+            'Medium':'M',
+            'Large':'L',
+            'X Large':'XL',
+            'XX Large':'XXL'
+    }
         this.addToCart = { 'css' : '#AddToCart' }, //#AddToCartText
         this.buyItNow = { 'css' : '#AddToCartForm > div.shopify-payment-button > div > div > div > button' },
 
@@ -38,10 +55,23 @@ module.exports = class ShopItem {
 
     async addSingleItemToCart(){
         await this.driver.wait( this.webdriver.until.elementLocated( this.singleItemTitle ) );
+        await this.driver.findElement( this.singleItme2ndColor ).click();
+        await this.driver.findElement( this.singleItemSizeXXL ).click();
+        let sizeXXLclass = await this.driver.findElement( this.singleItemSizeXXL ).getAttribute('class');
+        console.log(`XXL class is: ${sizeXXLclass}`);
+        if(sizeXXLclass.indexOf('disabled')>-1){
+            console.log('this combination is sold out!');
+        }
+        await this.driver.findElement( this.singleItemSizeXL ).click();
+
         let singleItemTitle = await this.driver.findElement( this.singleItemTitle ).getText();
         let singleItemPrice = await this.driver.findElement( this.singleItemPrice ).getText();
         let singleItemColor = await this.driver.findElement( this.singleItemColor ).getText();
         let singleItemSize = await this.driver.findElement( this.singleItemSize ).getText();
+        console.log('_________________');
+        console.log(`${singleItemSize} maps to ${this.sizeMap[singleItemSize]}`);
+        console.log('_________________');
+        singleItemSize = this.sizeMap[singleItemSize];
         await this.driver.findElement( this.buyItNow ).click();
         return { singleTitle: singleItemTitle, singlePrice: singleItemPrice, singleColor: singleItemColor, singleSize: singleItemSize};
 
