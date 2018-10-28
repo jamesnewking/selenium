@@ -8,6 +8,7 @@ const { expect } = require('chai');
 var driver;
 let browserToTest = process.argv[4];
 let checkPix = process.argv[5];
+let viewPort = process.argv[6];
 const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 const screenSize = {
@@ -17,7 +18,8 @@ const screenSize = {
 const hundPath = require('./hundreds_pom_path');
 const title = require("./pom_title");
 const shopitem = require("./pom_shopitem");
-let startTime, endTime;
+const viewPortSizes = require("./pom_viewport");
+let startTime, endTime, setViewPort;
 
 
 describe( 'The Hundreds smoke test', () => {
@@ -33,6 +35,7 @@ describe( 'The Hundreds smoke test', () => {
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.firefox())
+                    .setFirefoxOptions(new firefox.Options().setPreference("dom.webnotifications.enabled", false))
                     .build();
                 break;
             case '--headlessfirefox':
@@ -58,6 +61,7 @@ describe( 'The Hundreds smoke test', () => {
                 console.log('headless Chrome mode');
                 break;
             default:
+                browserToTest = '--chrome';
                 let options = new chrome.Options();
                 options.setUserPreferences({'profile.default_content_setting_values.notifications': 2});
                 driver = await new webdriver.Builder()
@@ -72,20 +76,26 @@ describe( 'The Hundreds smoke test', () => {
         console.log(`Testing browser: ${browserToTest}`);
         await driver.get('https://thehundreds.com/');
         await driver.manage().setTimeouts({implicit:10000});
-
+        console.log(`viewport: ${viewPort}`);
         if (browserToTest === 'edge'){
             await driver.manage().window().maximize();
         } else {
-            await driver.manage().window().setRect( {width: 1280, height: 920});
+            if (viewPort){
+                viewPort = viewPort.slice(2);
+                setViewPort = viewPortSizes[viewPort];
+            } else {
+                setViewPort = viewPortSizes['hd'];
+            }
+            await driver.manage().window().setRect( setViewPort );
         };
     } );
 
-    // after(async () => {
-    //     endTime = new Date();
-    //     console.log(`Ending test at ${endTime}`);
-    //     console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
-    //     await driver.quit();
-    // });
+    after(async () => {
+        endTime = new Date();
+        console.log(`Ending test at ${endTime}`);
+        console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
+        await driver.quit();
+    });
 
     it(`(1) testing webpage title`, async () => {
         let webTitle = new title(driver);
@@ -157,7 +167,7 @@ describe( 'The Hundreds smoke test', () => {
 
     it('(3) click shop on Nav', async () => {
         
-        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 1000 )).isDisplayed();
+        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 2000 )).isDisplayed();
         console.log(`hamburger? ${await hamburgerIsVisible}`);
         if ( hamburgerIsVisible ) {
             await driver.findElement( hundPath.topNavHamburger ).click();
@@ -172,15 +182,17 @@ describe( 'The Hundreds smoke test', () => {
 
     it('(4) add item to cart, verify product in cart', async () => {
         //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
-        let shopItem = new shopitem(driver, webdriver);
+        await driver.executeScript("window.scrollTo(0,30000);");
+        await driver.sleep(1500);
+        await driver.executeScript("window.scrollTo(0,-30000);");
+        let shopItem = new shopitem(driver, webdriver, 37);
         let gridItem = await shopItem.addOneItem();
         const { gridItemTitle, gridItemPrice } = gridItem;
-        console.log(`From the grid, the item: ${gridItemTitle} costs: ${gridItemPrice}`);
-
-        let singleItem = await shopItem.addSingleItemToCart();
+        let singleItem = await shopItem.addSingleItemToCart(0,0);
         const { singleTitle, singlePrice, singleColor, singleSize} = singleItem;
-        console.log(`the single item: ${ singleTitle} that costs: ${singlePrice} in: ${singleColor} size: ${singleSize}`);
-
+        
+        console.log(`From the grid,  the item: ${gridItemTitle}, price: ${gridItemPrice}`);
+        console.log(`the single item    title: ${ singleTitle}, price: ${singlePrice}, size: ${singleSize}, color: ${singleColor} `);
         let finalCart = await shopItem.getFinalCartInfo();
         const { payCartTitle, payCartPrice, payCartColor, payCartSize} = finalCart;
         expect( gridItemTitle.trim() ).to.equal(singleTitle.trim()  ,'Error: product name does not match!');
