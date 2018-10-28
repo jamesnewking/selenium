@@ -10,7 +10,7 @@
 # to run test with mocha/chai and selenium
 > make sure selenium server is running
 
-> mocha hundreds_pom.js --timeout=100000 --firefox --checkpix
+> mocha hundreds_pom.js --timeout=100000 --firefox --checkpix --ipadpro9
 
 > if there is no --firefox option, will run on chrome by default
 
@@ -20,5 +20,7 @@
 
 > for ie, make sure the system(not just the browser) display settings is set to 100% (scale and layout)
 
-> the last option: --checkpix is to verify all img on the main webpage have valid server response of 200; looking for broken img links 
+> the 3rd option: --checkpix is to verify all img on the main webpage have valid server response of 200; looking for broken img links; --none or nothing or any other commands will not run checkpix
+
+> the 4th option: --ipadpro9 is to set the viewport to run the test; if no options set then it will default to --hd
 
