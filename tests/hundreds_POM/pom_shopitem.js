@@ -82,30 +82,11 @@ module.exports = class ShopItem {
     /   color defaults to 0; 0 is the 1st availble color, 1 is the 2nd available color
     */
     async addSingleItemToCart(size=0,color=0){
-        //await this.driver.executeScript("window.scrollTo(0,1250);");//need to scroll into view, this is for ipadpro9
-        //need a solution that is dynamic to the viewport
-        //await this.driver.sleep(1500);
-
         await this.driver.wait( this.webdriver.until.elementLocated( this.singleItemPic ) );
         await this.driver.executeScript("window.scrollTo(0,19000);");
-        
-        // let itemPicElementLoc = await this.driver.findElement( this.singleItemPic );
-        // await this.driver.executeScript( "arguments[0].scrollIntoView(false);", itemPicElementLoc );
-        // let windowYoffset = 0;
-        // windowYoffset = await this.driver.executeScript( "return window.pageYOffset;");
-        // windowYoffset = windowYoffset * 2;
-        // console.log(`windowYoffset: ${windowYoffset}`);
-        // //console.log(`offsetHeight: ${itemPicElementLoc.offsetHeight}`);
-        // //await this.driver.executeScript( "window.scrollBy(0, -(arguments[0].offsetHeight)-arguments[1]) ;", itemPicElementLoc, windowYoffset );
-        // await this.driver.executeScript( "window.scrollBy(0, arguments[0]) ;", windowYoffset );
-        // //await this.driver.sleep(1500);
-        console.log(`find this item title?`);
         let itemBuyElementLoc = await this.driver.findElement( this.buyItNow );
         await this.driver.executeScript( "arguments[0].scrollIntoView(false);", itemBuyElementLoc );
-        console.log(`find this item color?`);
-        await this.driver.sleep(1500);
-//DEBUG________________________________________________
-       
+        
         await this.driver.findElement( this.singleColorArr[color] ).click();
         await this.driver.findElement( this.singleSizeArr[size] ).click();
         let selectedSizeClass = await this.driver.findElement( this.singleSizeArr[size] ).getAttribute('class');
@@ -115,8 +96,8 @@ module.exports = class ShopItem {
         let singleItemTitle = await this.driver.findElement( this.singleItemTitle ).getText();
         let singleItemPrice = await this.driver.findElement( this.singleItemPrice ).getText();
         let singleItemColor = await this.driver.findElement( this.singleItemColor ).getText();
-        let singleItemSize = await this.driver.findElement(  this.singleItemSize ).getText();
-        let colorElements = await this.driver.findElements(  this.singleItemColorSelection );
+        let singleItemSize  = await this.driver.findElement( this.singleItemSize ).getText();
+        let colorElements  = await this.driver.findElements( this.singleItemColorSelection );
         let numberOfColors = colorElements.length -1;
         console.log(`number of colors is: ${numberOfColors}`);
         console.log('_________________');
