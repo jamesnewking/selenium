@@ -9,6 +9,7 @@ var driver;
 let browserToTest = process.argv[4];
 let checkPix = process.argv[5];
 let viewPort = process.argv[6];
+let emulate = process.argv[7];
 const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 const screenSize = {
@@ -19,51 +20,61 @@ const hundPath = require('./hundreds_pom_path');
 const title = require("./pom_title");
 const shopitem = require("./pom_shopitem");
 const viewPortSizes = require("./pom_viewport");
+const emulatePhones = require("./pom_emulate");
 let startTime, endTime, setViewPort;
 
 
 describe( 'The Hundreds smoke test', () => {
     before(async () => {
+        browserToTest = browserToTest.slice(2);
+        let options = new chrome.Options();
+        options.setUserPreferences({'profile.default_content_setting_values.notifications': 2});
+        if (emulate){
+            emulate = emulate.slice(2);
+            if(browserToTest === 'chrome' || browserToTest === 'headlesschrome'){
+                console.log(`emulating: ${emulatePhones[emulate]}`);
+            };
+            options.setMobileEmulation({deviceName: `${emulatePhones[emulate]}`  });//mobile emulation
+        };
+            
         switch(browserToTest) {
-            case '--edge':
+            case 'edge':
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.edge())
                     .build();
                 break;
-            case '--firefox':
+            case 'firefox':
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.firefox())
                     .setFirefoxOptions(new firefox.Options().setPreference("dom.webnotifications.enabled", false))
                     .build();
                 break;
-            case '--headlessfirefox':
+            case 'headlessfirefox':
                 driver = await new webdriver
                     .Builder().usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.firefox())
                     .setFirefoxOptions(new firefox.Options().headless().windowSize(screenSize))
                     .build();
-                console.log('headless FireFox mode');
                 break;
-            case '--ie':
+            case 'ie':
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.ie())
                     .build();
                 break;
-            case '--headlesschrome':
+            case 'headlesschrome':
+                options.headless().windowSize(screenSize);
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.chrome())
-                    .setChromeOptions(new chrome.Options().headless().windowSize(screenSize))
+                    .setChromeOptions(options)
                     .build();
-                console.log('headless Chrome mode');
                 break;
+            case 'chrome':
             default:
-                browserToTest = '--chrome';
-                let options = new chrome.Options();
-                options.setUserPreferences({'profile.default_content_setting_values.notifications': 2});
+                browserToTest = 'chrome';
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.chrome())
@@ -72,22 +83,23 @@ describe( 'The Hundreds smoke test', () => {
         }
         startTime = new Date();
         console.log(`Starting test at ${startTime}`);
-        browserToTest = browserToTest.slice(2);
         console.log(`Testing browser: ${browserToTest}`);
         await driver.get('https://thehundreds.com/');
         await driver.manage().setTimeouts({implicit:10000});
         console.log(`viewport: ${viewPort}`);
-        if (browserToTest === 'edge'){
-            await driver.manage().window().maximize();
+        // if (browserToTest === 'edge'){
+        //     //await driver.manage().window().maximize();
+        //     console.log('why maximize?');
+        // } else {
+        if (viewPort){
+            viewPort = viewPort.slice(2);
+            setViewPort = viewPortSizes[viewPort];
         } else {
-            if (viewPort){
-                viewPort = viewPort.slice(2);
-                setViewPort = viewPortSizes[viewPort];
-            } else {
-                setViewPort = viewPortSizes['hd'];
-            }
-            await driver.manage().window().setRect( setViewPort );
-        };
+            setViewPort = viewPortSizes['hd'];
+        }
+        await driver.manage().window().setRect( setViewPort );
+        //bug: edge not resizing window
+        // };
     } );
 
     after(async () => {

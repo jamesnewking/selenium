@@ -10,7 +10,7 @@
 # to run test with mocha/chai and selenium
 > make sure selenium server is running
 
-> mocha hundreds_pom.js --timeout=100000 --firefox --checkpix --ipadpro9
+> mocha hundreds_pom.js --timeout=100000 --firefox --checkpix --ipadpro9 --ipadpro
 
 > if there is no --firefox option, will run on chrome by default
 
@@ -24,3 +24,8 @@
 
 > the 4th option: --ipadpro9 is to set the viewport to run the test; if no options set then it will default to --hd
 
+> the 5th option: --ipadpro is to emulate a certain device on Chrome; common emulation options are: iphonex, iphone8plus, ipad, ipadpro, galaxys5; note that the viewport should be set larger than the emulation option
+
+
+> issues:
+1) in edge browser, the browser window size would not resize properly
