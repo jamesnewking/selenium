@@ -51,18 +51,14 @@ module.exports = class ShopItem {
         this.addToCartText = { 'css' : '#AddToCartText' },
         this.buyItNow = { 'css' : '#AddToCartForm > div.shopify-payment-button > div > div > div > button' },
         this.morePaymentOptions = { 'css' : 'button.shopify-payment-button__more-options'},
-        this.showOrderSummary = { 'css': 'body > button > span > span > span.order-summary-toggle__text.order-summary-toggle__text--show'},
 
+        //#cart_form > div.products > div:nth-child(1) > div.desktop > div.right > div.info > a
+        //if multiple items in small cart
         this.smallCartTitle = { 'css' : '#cart_form > div.products > div > div.desktop > div.right > div.info > a'},
         this.smallCartColor = { 'css' : '#cart_form > div.products > div > div.desktop > div.right > div.options > div.color'},
         this.smallCartSize =  { 'css' :'#cart_form > div.products > div > div.desktop > div.right > div.options > div.size'},
         this.smallCartPrice = { 'css' : '#cart_form > div.products > div > div.next-line > p'},
-        this.smallCartCheckout = { 'css' : '#cart_form > div.has-items.first > a.btn.secondary.submit'},
-
-        this.payCartTitle = { 'css' : '#order-summary > div > div.order-summary__section.order-summary__section--product-list > div > table > tbody > tr > td.product__description > span.product__description__name.order-summary__emphasis'},
-        this.payCartPrice = { 'css' : '#order-summary > div > div.order-summary__section.order-summary__section--product-list > div > table > tbody > tr > td.product__price > span'},
-        this.payCartSizeColor = { 'css' : '#order-summary > div > div.order-summary__section.order-summary__section--product-list > div > table > tbody > tr > td.product__description > span.product__description__variant.order-summary__small-text'}
-
+        this.smallCartCheckout = { 'css' : '#cart_form > div.has-items.first > a.btn.secondary.submit'}
     };
 
     resetGridItemNumber(newGridItemNumber){
@@ -93,14 +89,15 @@ module.exports = class ShopItem {
     };
 
     async addOneItem(){
+        let gridItem = {};
         await this.driver.wait( this.webdriver.until.elementLocated( this.firstItemTitle ) );
         await this.driver.sleep(1000);//needed for mobile viewports
 
-        let itemTitle = await this.driver.findElement( this.firstItemTitle ).getText();
-        let itemPrice = await this.driver.findElement( this.firstItemPrice).getText();
+        gridItem.title = await this.driver.findElement( this.firstItemTitle ).getText();
+        gridItem.price = await this.driver.findElement( this.firstItemPrice).getText();
 
         await this.driver.findElement( this.firstItem ).click();
-        return({gridItemTitle:itemTitle, gridItemPrice:itemPrice});
+        return gridItem;
 
  }
 
@@ -110,6 +107,7 @@ module.exports = class ShopItem {
     /   color defaults to 0; 0 is the 1st availble color, 1 is the 2nd available color
     */
     async addSingleItemToCart(size=0,color=0){
+        let singleItem = {};
         await this.driver.wait( this.webdriver.until.elementLocated( this.singleItemPic ) );
         await this.driver.executeScript("window.scrollTo(0,19000);");
         let itemBuyElementLoc = await this.driver.findElement( this.buyItNow );
@@ -121,17 +119,18 @@ module.exports = class ShopItem {
         if(selectedSizeClass.indexOf('disabled')>-1){
             console.log('this combination is sold out!');
         };
-        let singleItemTitle = await this.driver.findElement( this.singleItemTitle ).getText();
-        let singleItemPrice = await this.driver.findElement( this.singleItemPrice ).getText();
-        let singleItemColor = await this.driver.findElement( this.singleItemColor ).getText();
-        let singleItemSize  = await this.driver.findElement( this.singleItemSize ).getText();
+        singleItem.title = await this.driver.findElement( this.singleItemTitle ).getText();
+        singleItem.price = await this.driver.findElement( this.singleItemPrice ).getText();
+        singleItem.color = await this.driver.findElement( this.singleItemColor ).getText();
+        singleItem.size  = await this.driver.findElement( this.singleItemSize ).getText();
+
         let colorElements  = await this.driver.findElements( this.singleItemColorSelection );
         let numberOfColors = colorElements.length -1;
         console.log(`number of colors is: ${numberOfColors}`);
         console.log('_________________');
-        console.log(`${singleItemSize} maps to ${this.sizeMap[singleItemSize]}`);
+        console.log(`${singleItem.size} maps to ${this.sizeMap[singleItem.size]}`);
         console.log('_________________');
-        singleItemSize = this.sizeMap[singleItemSize];
+        singleItem.size = this.sizeMap[singleItem.size];
         let buyItNowDisabled = await this.driver.findElement( this.buyItNow ).getAttribute('disabled');
         if (buyItNowDisabled){
             console.log('can not buy it now');
@@ -141,44 +140,38 @@ module.exports = class ShopItem {
             await this.driver.findElement( this.singleColorArr[0] ).click();
             await this.driver.findElement( this.singleSizeArr[0] ).click();
         }
-        let morePaymentOptions = await this.driver.findElement( this.morePaymentOptions ).isDisplayed();
-        if ( morePaymentOptions ){
-            await this.driver.findElement( this.morePaymentOptions ).click();
-        };
-        await this.driver.findElement( this.buyItNow ).click();
-        return { singleTitle: singleItemTitle, singlePrice: singleItemPrice, singleColor: singleItemColor, singleSize: singleItemSize};
+
+        // let morePaymentOptions = await this.driver.findElement( this.morePaymentOptions ).isDisplayed();
+        // if ( morePaymentOptions ){
+        //     await this.driver.findElement( this.morePaymentOptions ).click();
+        // };//this is not needed if going to small cart first
+
+        //go to small cart
+        await this.driver.findElement( this.addToCart ).click();
+        let smallCart = await this.getSmallCartInfo();
+        console.log(`testing small cart`);
+        //debug
+        await this.driver.findElement( this.smallCartCheckout ).click();
+        return singleItem;
 
     }
 
     async getSmallCartInfo(){
+        //await this.driver.switchTo().activeElement();
+        //await this.driver.switchTo().defaultContent();
+        let smallCart = {};
         await this.driver.wait( this.webdriver.until.elementLocated( this.smallCartTitle ) );
-        let smallCartTitle = await this.driver.findElement( this.smallCartTitle ).getText();
-        let smallCartPrice = await this.driver.findElement( this.smallCartPrice ).getText();
-        let smallCartColor = await this.driver.findElement( this.smallCartColor ).getText();
-        let smallCartSize = await this.driver.findElement( this.smallCartSize ).getText();
-        await this.driver.findElement( this.addToCart ).click();
-        return { smallCartTitle: smallCartTitle, smallCartPrice: smallCartPrice, smallCartColor: smallCartColor, smallCartSize: smallCartSize};
+        smallCart.smallCartTitle = await this.driver.findElement( this.smallCartTitle ).getText();
+        smallCart.smallCartPrice = await this.driver.findElement( this.smallCartPrice ).getText();
+        smallCart.smallCartColor = await this.driver.findElement( this.smallCartColor ).getText();
+        smallCart.smallCartSize = await this.driver.findElement( this.smallCartSize ).getText();
+
+        console.log(`small cart: ${smallCart.smallCartTitle}`);
+        console.log(`small cart: ${smallCart.smallCartPrice}`);
+        console.log(`small cart: ${smallCart.smallCartColor}`);
+        console.log(`small cart: ${smallCart.smallCartSize}`);
+        //await this.driver.findElement( this.addToCart ).click();
+        return smallCart;
     }
-
-    async getFinalCartInfo(){
-        let orderSummaryDropdown = await this.driver.findElement( this.showOrderSummary ).isDisplayed();
-        if ( orderSummaryDropdown ){
-            await this.driver.findElement( this.showOrderSummary ).click();
-        };
-
-        await this.driver.wait( this.webdriver.until.elementLocated( this.payCartTitle ) );
-        let payCartTitle = await this.driver.findElement( this.payCartTitle ).getText();
-        let payCartPrice = await this.driver.findElement( this.payCartPrice ).getText();
-        let payCartSizeColor = await this.driver.findElement( this.payCartSizeColor ).getText();
-        console.log(`The final pay cart title: ${payCartTitle}, price: ${payCartPrice}, size/color: ${payCartSizeColor}`)
-        const slashLoc = payCartSizeColor.lastIndexOf('/');
-        //console.log( slashLoc);
-        const payCartSize = payCartSizeColor.slice(0,slashLoc-1);
-        //console.log( `size: ${payCartSize}`);
-        const payCartColor = payCartSizeColor.slice(slashLoc+2);
-        //console.log( `color: ${payCartColor}`);
-        return { payCartTitle: payCartTitle, payCartPrice: payCartPrice, payCartColor: payCartColor, payCartSize: payCartSize};
-    }
-
 
 }
