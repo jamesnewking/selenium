@@ -1,11 +1,13 @@
 module.exports = class ShopItem {
-    constructor (driver, webdriver, gridItemNumber){
+    constructor (driver, webdriver, gridItemNumber=1){
         this.driver = driver;
         this.webdriver = webdriver;
+        this.gridItemNumber = gridItemNumber;
 
-        this.firstItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${gridItemNumber}) > a > div`},//.flip-to-back
-        this.firstItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${gridItemNumber}) > div > a`},
-        this.firstItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${gridItemNumber}) > div > p > span`},
+        this.itemElement =    { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div`},
+        this.firstItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`},//.flip-to-back
+        this.firstItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`},
+        this.firstItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`},
 
         this.singleItemPic = { 'css' : '#mobile_product_carousel > div > div > img.is-selected'},//for mobile
         this.singleItemTitle = { 'css' : '#PageContainer > main > div > div > div > div.clearfix.quickview-content > div.grid__item.main-info.animate.slide-left.animated > h1'},
@@ -63,8 +65,34 @@ module.exports = class ShopItem {
 
     };
 
-    async addOneItem(){
+    resetGridItemNumber(newGridItemNumber){
+        let originalGridNumber = this.gridItemNumber;
+        this.gridItemNumber = newGridItemNumber;
+        this.firstItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`};//.flip-to-back
+        this.firstItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`};
+        this.firstItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`};
+        return originalGridNumber;
+    };
 
+    async iterateGridItems(){
+        let originalNumber = this.gridItemNumber;
+        let allItemElements = await this.driver.findElements( this.itemElement );
+        let numberOfItemsInGrid = allItemElements.length;
+        let itemElement, itemTitle, itemPrice;
+        console.log(`Total number of items on this page: ${numberOfItemsInGrid}`);
+        for (let i=1; i<numberOfItemsInGrid+1 ;i++){
+            this.resetGridItemNumber(i); 
+            itemElement = await this.driver.findElement( this.firstItem );   
+            itemTitle = await this.driver.findElement( this.firstItemTitle ).getText();
+            itemPrice = await this.driver.findElement( this.firstItemPrice ).getText();
+            console.log(`${i}) ${itemTitle} ${itemPrice}`);
+            await this.driver.executeScript( "arguments[0].scrollIntoView(true);", itemElement );
+        };
+        this.resetGridItemNumber(originalNumber);
+        return numberOfItemsInGrid;
+    };
+
+    async addOneItem(){
         await this.driver.wait( this.webdriver.until.elementLocated( this.firstItemTitle ) );
         await this.driver.sleep(1000);//needed for mobile viewports
 
@@ -123,7 +151,6 @@ module.exports = class ShopItem {
     }
 
     async getSmallCartInfo(){
-        //await this.driver.sleep(3000);
         await this.driver.wait( this.webdriver.until.elementLocated( this.smallCartTitle ) );
         let smallCartTitle = await this.driver.findElement( this.smallCartTitle ).getText();
         let smallCartPrice = await this.driver.findElement( this.smallCartPrice ).getText();
@@ -143,7 +170,7 @@ module.exports = class ShopItem {
         let payCartTitle = await this.driver.findElement( this.payCartTitle ).getText();
         let payCartPrice = await this.driver.findElement( this.payCartPrice ).getText();
         let payCartSizeColor = await this.driver.findElement( this.payCartSizeColor ).getText();
-        console.log(`the final pay cart title: ${payCartTitle}, price: ${payCartPrice}, size/color: ${payCartSizeColor}`)
+        console.log(`The final pay cart title: ${payCartTitle}, price: ${payCartPrice}, size/color: ${payCartSizeColor}`)
         const slashLoc = payCartSizeColor.lastIndexOf('/');
         //console.log( slashLoc);
         const payCartSize = payCartSizeColor.slice(0,slashLoc-1);
