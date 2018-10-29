@@ -192,11 +192,18 @@ describe( 'The Hundreds smoke test', () => {
         
     });
 
-    it('(4) add item to cart, verify product in cart', async () => {
+    it('(4) verify names/prices of items for purchase', async () => {
+        let checkShopItem = new shopitem(driver, webdriver);
+        let numberItemsScreen = await checkShopItem.iterateGridItems();//debug
+        expect( numberItemsScreen ).to.equal( 48 ,'Error: number of products does not match!');
+    });
+
+    it('(5) add item to cart, verify product in cart', async () => {
         //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
         await driver.executeScript("window.scrollTo(0,30000);");
         await driver.sleep(1500);
         await driver.executeScript("window.scrollTo(0,-30000);");
+        
         let shopItem = new shopitem(driver, webdriver, 37);
         let gridItem = await shopItem.addOneItem();
         const { gridItemTitle, gridItemPrice } = gridItem;
@@ -204,7 +211,7 @@ describe( 'The Hundreds smoke test', () => {
         const { singleTitle, singlePrice, singleColor, singleSize} = singleItem;
         
         console.log(`From the grid,  the item: ${gridItemTitle}, price: ${gridItemPrice}`);
-        console.log(`the single item    title: ${ singleTitle}, price: ${singlePrice}, size: ${singleSize}, color: ${singleColor} `);
+        console.log(`From single item   title: ${ singleTitle}, price: ${singlePrice}, size: ${singleSize}, color: ${singleColor} `);
         let finalCart = await shopItem.getFinalCartInfo();
         const { payCartTitle, payCartPrice, payCartColor, payCartSize} = finalCart;
         expect( gridItemTitle.trim() ).to.equal(singleTitle.trim()  ,'Error: product name does not match!');
