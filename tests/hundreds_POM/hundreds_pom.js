@@ -21,6 +21,7 @@ const title = require("./pom_title");
 const shopitem = require("./pom_shopitem");
 const viewPortSizes = require("./pom_viewport");
 const emulatePhones = require("./pom_emulate");
+const PayCart = require("./pom_paycart");
 let startTime, endTime, setViewPort;
 
 
@@ -102,17 +103,17 @@ describe( 'The Hundreds smoke test', () => {
         // };
     } );
 
-    after(async () => {
-        endTime = new Date();
-        console.log(`Ending test at ${endTime}`);
-        console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
-        await driver.quit();
-    });
+    // after(async () => {
+    //     endTime = new Date();
+    //     console.log(`Ending test at ${endTime}`);
+    //     console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
+    //     await driver.quit();
+    // });
 
-    it(`(1) testing webpage title`, async () => {
-        let webTitle = new title(driver);
-        expect(webTitle.expectedTitleName).to.equal(await webTitle.actualWebTitle(), 'Error: main webpage title does not match')
-    })
+    // it(`(1) testing webpage title`, async () => {
+    //     let webTitle = new title(driver);
+    //     expect(webTitle.expectedTitleName).to.equal(await webTitle.actualWebTitle(), 'Error: main webpage title does not match')
+    // })
 
 
     it('(2) all img URLs are valid links, returns server code 200', async () => {
@@ -192,34 +193,43 @@ describe( 'The Hundreds smoke test', () => {
         
     });
 
-    it('(4) verify names/prices of items for purchase', async () => {
+    xit('(4) verify names/prices of items for purchase', async () => {
         let checkShopItem = new shopitem(driver, webdriver);
         let numberItemsScreen = await checkShopItem.iterateGridItems();//debug
         expect( numberItemsScreen ).to.equal( 48 ,'Error: number of products does not match!');
     });
 
     it('(5) add item to cart, verify product in cart', async () => {
+        let singleItem = {};
+        let gridItem = {};
+        //let payCart = {};
         //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
         await driver.executeScript("window.scrollTo(0,30000);");
         await driver.sleep(1500);
         await driver.executeScript("window.scrollTo(0,-30000);");
         
         let shopItem = new shopitem(driver, webdriver, 37);
-        let gridItem = await shopItem.addOneItem();
-        const { gridItemTitle, gridItemPrice } = gridItem;
-        let singleItem = await shopItem.addSingleItemToCart(0,0);
-        const { singleTitle, singlePrice, singleColor, singleSize} = singleItem;
+        gridItem = await shopItem.addOneItem();
+        console.log(gridItem);//debug
+        //const { gridItemTitle, gridItemPrice } = gridItem;
+        singleItem = await shopItem.addSingleItemToCart(0,0);
+        //const { singleTitle, singlePrice, singleColor, singleSize} = singleItem;
+        console.log(singleItem);//debug
+        console.log(`From the grid,  the item: ${ gridItem.title }, price: ${ gridItem.price }`);
+        console.log(`From single item   title: ${ singleItem.title}, price: ${singleItem.price}, size: ${singleItem.size}, color: ${singleItem.color} `);
         
-        console.log(`From the grid,  the item: ${gridItemTitle}, price: ${gridItemPrice}`);
-        console.log(`From single item   title: ${ singleTitle}, price: ${singlePrice}, size: ${singleSize}, color: ${singleColor} `);
-        let finalCart = await shopItem.getFinalCartInfo();
-        const { payCartTitle, payCartPrice, payCartColor, payCartSize} = finalCart;
-        expect( gridItemTitle.trim() ).to.equal(singleTitle.trim()  ,'Error: product name does not match!');
-        expect( gridItemTitle.trim() ).to.equal(payCartTitle.trim() ,'Error: product name does not match!');
-        expect( gridItemPrice.trim() ).to.equal(singlePrice.trim()  ,'Error: product price does not match!');
-        expect( gridItemPrice.trim() ).to.equal(payCartPrice.trim() ,'Error: product price does not match!');
-        expect( singleColor.trim()   ).to.equal(payCartColor.trim() ,'Error: product color does not match!');
-        expect( singleSize.trim()    ).to.equal(payCartSize.trim()  ,'Error: product size does not match!');
+        let finalPayCart = new PayCart(driver, webdriver);
+        let checkOutCart = await finalPayCart.getFinalCartInfo();
+        console.log(`********************`);
+        console.log(checkOutCart);
+        //payCart = await shopItem.getFinalCartInfo();
+        //const { payCartTitle, payCartPrice, payCartColor, payCartSize} = finalCart;
+        expect( gridItem.title.trim() ).to.equal( singleItem.title.trim()  ,'Error: product name does not match!');
+        expect( gridItem.title.trim() ).to.equal( checkOutCart.title.trim() ,'Error: product name does not match!');
+        expect( gridItem.price.trim() ).to.equal( singleItem.price.trim()  ,'Error: product price does not match!');
+        expect( gridItem.price.trim() ).to.equal( checkOutCart.price.trim() ,'Error: product price does not match!');
+        expect( singleItem.color.trim()   ).to.equal( checkOutCart.color.trim() ,'Error: product color does not match!');
+        expect( singleItem.size.trim()    ).to.equal( checkOutCart.size.trim()  ,'Error: product size does not match!');
     });
 
 
