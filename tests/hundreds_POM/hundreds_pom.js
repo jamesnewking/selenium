@@ -5,7 +5,7 @@ const webdriver = require('selenium-webdriver'),
     logging = webdriver.logging,
     until = webdriver.until;
 const { expect } = require('chai');
-var driver;
+var driver, testingBrowser;
 let browserToTest = process.argv[4];
 let checkPix = process.argv[5];
 let viewPort = process.argv[6];
@@ -27,6 +27,9 @@ let startTime, endTime, setViewPort;
 
 describe( 'The Hundreds smoke test', () => {
     before(async () => {
+        if (browserToTest=== undefined){
+            browserToTest = '--chrome';
+        }
         browserToTest = browserToTest.slice(2);
         let options = new chrome.Options();
         options.setUserPreferences({'profile.default_content_setting_values.notifications': 2});
@@ -39,6 +42,12 @@ describe( 'The Hundreds smoke test', () => {
         };
             
         switch(browserToTest) {
+            case 'safari':
+                driver = await new webdriver.Builder()
+                .usingServer('http://localhost:4444/wd/hub')
+                .withCapabilities(webdriver.Capabilities.safari())
+                .build();
+                break;
             case 'edge':
                 driver = await new webdriver.Builder()
                     .usingServer('http://localhost:4444/wd/hub')
@@ -80,14 +89,17 @@ describe( 'The Hundreds smoke test', () => {
                     .usingServer('http://localhost:4444/wd/hub')
                     .withCapabilities(webdriver.Capabilities.chrome())
                     .setChromeOptions(options)
-                    .build();
+                    .build(); 
         }
         startTime = new Date();
         console.log(`Starting test at ${startTime}`);
-        console.log(`Testing browser: ${browserToTest}`);
+        let testCapa = await driver.getCapabilities();
+        testingBrowser = await testCapa.getBrowserName();
+        console.log(`Testing browser: ${testingBrowser}`);
+        //____________________________________________//
         await driver.get('https://thehundreds.com/');
         await driver.manage().setTimeouts({implicit:10000});
-        console.log(`viewport: ${viewPort}`);
+        
         // if (browserToTest === 'edge'){
         //     //await driver.manage().window().maximize();
         //     console.log('why maximize?');
@@ -97,23 +109,25 @@ describe( 'The Hundreds smoke test', () => {
             setViewPort = viewPortSizes[viewPort];
         } else {
             setViewPort = viewPortSizes['hd'];
-        }
+            viewPort = 'hd'
+        };
+        console.log(`viewport: ${viewPort}`);
         await driver.manage().window().setRect( setViewPort );
         //bug: edge not resizing window
         // };
     } );
 
-    // after(async () => {
-    //     endTime = new Date();
-    //     console.log(`Ending test at ${endTime}`);
-    //     console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
-    //     await driver.quit();
-    // });
+    after(async () => {
+        endTime = new Date();
+        console.log(`Ending test at ${endTime}`);
+        console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
+        await driver.quit();
+    });
 
-    // it(`(1) testing webpage title`, async () => {
-    //     let webTitle = new title(driver);
-    //     expect(webTitle.expectedTitleName).to.equal(await webTitle.actualWebTitle(), 'Error: main webpage title does not match')
-    // })
+    it(`(1) testing webpage title`, async () => {
+        let webTitle = new title(driver);
+        expect(webTitle.expectedTitleName).to.equal(await webTitle.actualWebTitle(), 'Error: main webpage title does not match')
+    })
 
 
     it('(2) all img URLs are valid links, returns server code 200', async () => {
@@ -193,8 +207,8 @@ describe( 'The Hundreds smoke test', () => {
         
     });
 
-    xit('(4) verify names/prices of items for purchase', async () => {
-        let checkShopItem = new shopitem(driver, webdriver);
+    it('(4) verify names/prices of items for purchase', async () => {
+        let checkShopItem = new shopitem(driver, webdriver, testingBrowser);
         let numberItemsScreen = await checkShopItem.iterateGridItems();//debug
         expect( numberItemsScreen ).to.equal( 48 ,'Error: number of products does not match!');
     });
@@ -202,28 +216,28 @@ describe( 'The Hundreds smoke test', () => {
     it('(5) add item to cart, verify product in cart', async () => {
         let singleItem = {};
         let gridItem = {};
-        //let payCart = {};
         //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
+        if (testingBrowser==='safari'){
+            await driver.sleep(1500);
+        };
         await driver.executeScript("window.scrollTo(0,30000);");
-        await driver.sleep(1500);
+        await driver.sleep(2500);
         await driver.executeScript("window.scrollTo(0,-30000);");
         
-        let shopItem = new shopitem(driver, webdriver, 37);
+        let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
         gridItem = await shopItem.addOneItem();
-        console.log(gridItem);//debug
-        //const { gridItemTitle, gridItemPrice } = gridItem;
-        singleItem = await shopItem.addSingleItemToCart(0,0);
-        //const { singleTitle, singlePrice, singleColor, singleSize} = singleItem;
-        console.log(singleItem);//debug
+        if (testingBrowser==='safari'){
+            await driver.sleep(3000);
+        };
+        singleItem = await shopItem.addSingleItemToCart(1,1);
         console.log(`From the grid,  the item: ${ gridItem.title }, price: ${ gridItem.price }`);
         console.log(`From single item   title: ${ singleItem.title}, price: ${singleItem.price}, size: ${singleItem.size}, color: ${singleItem.color} `);
-        
+
+        if (testingBrowser==='safari'){
+            await driver.sleep(3000);
+        };
         let finalPayCart = new PayCart(driver, webdriver);
         let checkOutCart = await finalPayCart.getFinalCartInfo();
-        console.log(`********************`);
-        console.log(checkOutCart);
-        //payCart = await shopItem.getFinalCartInfo();
-        //const { payCartTitle, payCartPrice, payCartColor, payCartSize} = finalCart;
         expect( gridItem.title.trim() ).to.equal( singleItem.title.trim()  ,'Error: product name does not match!');
         expect( gridItem.title.trim() ).to.equal( checkOutCart.title.trim() ,'Error: product name does not match!');
         expect( gridItem.price.trim() ).to.equal( singleItem.price.trim()  ,'Error: product price does not match!');
