@@ -14,11 +14,13 @@
 
 > if there is no --firefox option, will run on chrome by default
 
-> options of browsers to test are: --chrome --firefox --edge --ie --headlesschrome --headlessfirefox
+> options of browsers to test are: --chrome --firefox --edge --ie --headlesschrome --headlessfirefox --safari
 
 > for edge, set the --timeout=200000 (edge is slow, need longer time to execute)
 
 > for ie, make sure the system(not just the browser) display settings is set to 100% (scale and layout)
+
+> for safari, make sure to enable safari automation in the system and add the selenium extension in safari
 
 > the 3rd option: --checkpix is to verify all img on the main webpage have valid server response of 200; looking for broken img links; --none or nothing or any other commands will not run checkpix
 
