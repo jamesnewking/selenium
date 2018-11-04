@@ -6,9 +6,12 @@ module.exports = class ShopItem {
         this.gridItemNumber = gridItemNumber;
 
         this.itemElement =    { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div`},
-        this.firstItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`},//.flip-to-back
-        this.firstItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`},
-        this.firstItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`},
+        this.selectItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`},//.flip-to-back
+        this.selectItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`},
+        this.selectItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`},
+        
+        this.firstItem = {'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(1) > div > a`},
+        this.lastElementOnPage = {'css' : `#PageContainer > footer > div > div > div.grid__item.large--six-twelfths > div.footer-newsletter`},
 
         this.singleItemPic = { 'css' : '#mobile_product_carousel > div > div > img.is-selected'},//for mobile
         this.singleItemTitle = { 'css' : '#PageContainer > main > div > div > div > div.clearfix.quickview-content > div.grid__item.main-info.animate.slide-left.animated > h1'},
@@ -52,6 +55,7 @@ module.exports = class ShopItem {
         this.addToCartText = { 'css' : '#AddToCartText' },
         this.buyItNow = { 'css' : '#AddToCartForm > div.shopify-payment-button > div > div > div > button' },
         this.morePaymentOptions = { 'css' : 'button.shopify-payment-button__more-options'},
+        this.checkoutButton = { 'css' : 'body > div.shopify-cleanslate > div > span > div > div > div:nth-child(2) > div > div > div:nth-child(2) > div > button'},
 
         //#cart_form > div.products > div:nth-child(1) > div.desktop > div.right > div.info > a
         //if multiple items in small cart
@@ -62,12 +66,21 @@ module.exports = class ShopItem {
         this.smallCartCheckout = { 'css' : '#cart_form > div.has-items.first > a.btn.secondary.submit'}
     };
 
+    async scrollDownUpPage(){
+        
+        await this.driver.wait( this.webdriver.until.elementLocated( this.firstItem ), 5000 );
+        await this.driver.executeScript("window.scrollTo(0,30000);");
+        await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement( this.lastElementOnPage )), 30000 );
+        await this.driver.executeScript("window.scrollTo(0,-30000);");
+        await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement( this.firstItem )), 30000 );
+    };
+
     resetGridItemNumber(newGridItemNumber){
         let originalGridNumber = this.gridItemNumber;
         this.gridItemNumber = newGridItemNumber;
-        this.firstItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`};//.flip-to-back
-        this.firstItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`};
-        this.firstItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`};
+        this.selectItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`};//.flip-to-back
+        this.selectItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`};
+        this.selectItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`};
         return originalGridNumber;
     };
 
@@ -84,9 +97,9 @@ module.exports = class ShopItem {
         console.log(`Total number of items on this page: ${numberOfItemsInGrid}`);
         for (let i=1; i<numberOfItemsInGrid+1 ;i++){
             this.resetGridItemNumber(i); 
-            itemElement = await this.driver.findElement( this.firstItem );   
-            itemTitle = await this.driver.findElement( this.firstItemTitle ).getText();
-            itemPrice = await this.driver.findElement( this.firstItemPrice ).getText();
+            itemElement = await this.driver.findElement( this.selectItem );   
+            itemTitle = await this.driver.findElement( this.selectItemTitle ).getText();
+            itemPrice = await this.driver.findElement( this.selectItemPrice ).getText();
             console.log(`${i}) ${itemTitle} ${itemPrice}`);
             await this.driver.executeScript( "arguments[0].scrollIntoView(true);", itemElement );
         };
@@ -96,13 +109,13 @@ module.exports = class ShopItem {
 
     async addOneItem(){
         let gridItem = {};
-        await this.driver.wait( this.webdriver.until.elementLocated( this.firstItemTitle ) );
+        await this.driver.wait( this.webdriver.until.elementLocated( this.selectItemTitle ) );
         await this.driver.sleep(2500);//needed for mobile viewports and safari
 
-        gridItem.title = await this.driver.findElement( this.firstItemTitle ).getText();
-        gridItem.price = await this.driver.findElement( this.firstItemPrice).getText();
+        gridItem.title = await this.driver.findElement( this.selectItemTitle ).getText();
+        gridItem.price = await this.driver.findElement( this.selectItemPrice).getText();
 
-        await this.driver.findElement( this.firstItem ).click();
+        await this.driver.findElement( this.selectItem ).click();
         return gridItem;
 
  }
@@ -150,12 +163,23 @@ module.exports = class ShopItem {
         // let morePaymentOptions = await this.driver.findElement( this.morePaymentOptions ).isDisplayed();
         // if ( morePaymentOptions ){
         //     await this.driver.findElement( this.morePaymentOptions ).click();
-        // };//this is not needed if going to small cart first
+        // };//this is not needed if going to small cart first//sometimes seen on safari
 
         //go to small cart
         await this.driver.findElement( this.addToCart ).click();
         if (this.testingBrowser === 'safari'){
-            await this.driver.findElement( this.buyItNow ).click();//safari doesn't have the small cart
+            let morePaymentIsVisible = await this.driver.wait(this.webdriver.until.elementLocated( this.morePaymentOptions ), 2000 ).isDisplayed();
+            console.log(`is morePayment visible?`);
+            console.log(morePaymentIsVisible);
+            await this.driver.findElement( this.buyItNow ).click();
+            if(morePaymentIsVisible){
+                console.log(`alternate payment options like amazon pay`);
+                //await this.driver.findElement( this.morePaymentOptions ).click();
+                await this.driver.switchTo().activeElement();//debug
+                await this.driver.wait( this.webdriver.until.elementIsVisible(this.driver.findElement(this.checkoutButton)), 2500);
+                await this.driver.findElement( this.checkoutButton ).click();
+            }
+             
         } else {
             let smallCart = await this.getSmallCartInfo();
             console.log(`testing small cart`);

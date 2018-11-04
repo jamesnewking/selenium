@@ -98,7 +98,7 @@ describe( 'The Hundreds smoke test', () => {
         console.log(`Testing browser: ${testingBrowser}`);
         //____________________________________________//
         await driver.get('https://thehundreds.com/');
-        await driver.manage().setTimeouts({implicit:10000});
+        //await driver.manage().setTimeouts({implicit:10000});//debug
         
         // if (browserToTest === 'edge'){
         //     //await driver.manage().window().maximize();
@@ -121,7 +121,7 @@ describe( 'The Hundreds smoke test', () => {
         endTime = new Date();
         console.log(`Ending test at ${endTime}`);
         console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
-        await driver.quit();
+        // await driver.quit();
     });
 
     it(`(1) testing webpage title`, async () => {
@@ -194,7 +194,8 @@ describe( 'The Hundreds smoke test', () => {
 
     it('(3) click shop on Nav', async () => {
         
-        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 2000 )).isDisplayed();
+        //let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 2000 )).isDisplayed();
+        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger), 2000 ).isDisplayed();
         console.log(`hamburger? ${await hamburgerIsVisible}`);
         if ( hamburgerIsVisible ) {
             await driver.findElement( hundPath.topNavHamburger ).click();
@@ -207,7 +208,7 @@ describe( 'The Hundreds smoke test', () => {
         
     });
 
-    it('(4) verify names/prices of items for purchase', async () => {
+    xit('(4) verify names/prices of items for purchase', async () => {
         let checkShopItem = new shopitem(driver, webdriver, testingBrowser);
         let numberItemsScreen = await checkShopItem.iterateGridItems();//debug
         expect( numberItemsScreen ).to.equal( 48 ,'Error: number of products does not match!');
@@ -216,15 +217,9 @@ describe( 'The Hundreds smoke test', () => {
     it('(5) add item to cart, verify product in cart', async () => {
         let singleItem = {};
         let gridItem = {};
-        //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
-        if (testingBrowser==='safari'){
-            await driver.sleep(1500);
-        };
-        await driver.executeScript("window.scrollTo(0,30000);");
-        await driver.sleep(2500);
-        await driver.executeScript("window.scrollTo(0,-30000);");
         
         let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
+        await shopItem.scrollDownUpPage();
         gridItem = await shopItem.addOneItem();
         if (testingBrowser==='safari'){
             await driver.sleep(3000);
