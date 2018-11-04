@@ -9,10 +9,11 @@ module.exports = class ShopItem {
         this.selectItem =      { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > a > div`},//.flip-to-back
         this.selectItemTitle = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > a`},
         this.selectItemPrice = { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(${this.gridItemNumber}) > div > p > span`},
-        
-        this.firstItem = {'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(1) > div > a`},
+              
+        this.firstItem = { 'css' : '#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div:nth-child(1) > a > div.flip-to-back > img.front-image'},
         this.lastElementOnPage = {'css' : `#PageContainer > footer > div > div > div.grid__item.large--six-twelfths > div.footer-newsletter`},
 
+        this.desktopSingleItemPic = { 'css' : '#desktop_product_carousel > div > div > span.is-selected > img.original'},
         this.singleItemPic = { 'css' : '#mobile_product_carousel > div > div > img.is-selected'},//for mobile
         this.singleItemTitle = { 'css' : '#PageContainer > main > div > div > div > div.clearfix.quickview-content > div.grid__item.main-info.animate.slide-left.animated > h1'},
         this.singleItemPrice = { 'css' : '#ProductPrice > span '},
@@ -51,7 +52,7 @@ module.exports = class ShopItem {
             'One Size':'O/S',
             'N/A':'N/A'
     }
-        this.addToCart = { 'css' : '#AddToCart' }, //#AddToCartText
+        this.addToCart = { 'css' : '#AddToCart' },
         this.addToCartText = { 'css' : '#AddToCartText' },
         this.buyItNow = { 'css' : '#AddToCartForm > div.shopify-payment-button > div > div > div > button' },
         this.morePaymentOptions = { 'css' : 'button.shopify-payment-button__more-options'},
@@ -67,8 +68,11 @@ module.exports = class ShopItem {
     };
 
     async scrollDownUpPage(){
-        
-        await this.driver.wait( this.webdriver.until.elementLocated( this.firstItem ), 5000 );
+        try{
+            await this.driver.wait( this.webdriver.until.elementLocated( this.firstItem ), 5000 );
+        }catch{
+            await this.driver.sleep(3000);
+        };
         await this.driver.executeScript("window.scrollTo(0,30000);");
         await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement( this.lastElementOnPage )), 30000 );
         await this.driver.executeScript("window.scrollTo(0,-30000);");
@@ -109,12 +113,9 @@ module.exports = class ShopItem {
 
     async addOneItem(){
         let gridItem = {};
-        await this.driver.wait( this.webdriver.until.elementLocated( this.selectItemTitle ) );
-        await this.driver.sleep(2500);//needed for mobile viewports and safari
-
+        await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement( this.selectItemTitle )), 30000 );
         gridItem.title = await this.driver.findElement( this.selectItemTitle ).getText();
         gridItem.price = await this.driver.findElement( this.selectItemPrice).getText();
-
         await this.driver.findElement( this.selectItem ).click();
         return gridItem;
 
@@ -127,11 +128,16 @@ module.exports = class ShopItem {
     */
     async addSingleItemToCart(size=0,color=0){
         let singleItem = {};
-        await this.driver.wait( this.webdriver.until.elementLocated( this.singleItemPic ) );
+        try {
+            await this.driver.wait( this.webdriver.until.elementLocated( this.singleItemPic ), 3000 );
+            await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement( this.singleItemPic )), 3000 );
+        } catch (error) {
+            await this.driver.wait( this.webdriver.until.elementLocated( this.desktopSingleItemPic ), 3000 );
+            await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement( this.desktopSingleItemPic )), 3000 );
+        }
         await this.driver.executeScript("window.scrollTo(0,19000);");
-        let itemBuyElementLoc = await this.driver.findElement( this.buyItNow );
+        let itemBuyElementLoc = await this.driver.wait( this.webdriver.until.elementLocated( this.buyItNow ),3000);
         await this.driver.executeScript( "arguments[0].scrollIntoView(false);", itemBuyElementLoc );
-        
         await this.driver.findElement( this.singleColorArr[color] ).click();
         await this.driver.findElement( this.singleSizeArr[size] ).click();
         let selectedSizeClass = await this.driver.findElement( this.singleSizeArr[size] ).getAttribute('class');
@@ -159,34 +165,23 @@ module.exports = class ShopItem {
             await this.driver.findElement( this.singleColorArr[0] ).click();
             await this.driver.findElement( this.singleSizeArr[0] ).click();
         }
-
-        // let morePaymentOptions = await this.driver.findElement( this.morePaymentOptions ).isDisplayed();
-        // if ( morePaymentOptions ){
-        //     await this.driver.findElement( this.morePaymentOptions ).click();
-        // };//this is not needed if going to small cart first//sometimes seen on safari
-
-        //go to small cart
         await this.driver.findElement( this.addToCart ).click();
         if (this.testingBrowser === 'safari'){
             let morePaymentIsVisible = await this.driver.wait(this.webdriver.until.elementLocated( this.morePaymentOptions ), 2000 ).isDisplayed();
-            console.log(`is morePayment visible?`);
-            console.log(morePaymentIsVisible);
+            console.log(`is morePayment visible? ${morePaymentIsVisible}`);
             await this.driver.findElement( this.buyItNow ).click();
             if(morePaymentIsVisible){
                 console.log(`alternate payment options like amazon pay`);
-                //await this.driver.findElement( this.morePaymentOptions ).click();
                 await this.driver.switchTo().activeElement();//debug
                 await this.driver.wait( this.webdriver.until.elementIsVisible(this.driver.findElement(this.checkoutButton)), 2500);
                 await this.driver.findElement( this.checkoutButton ).click();
             }
-             
         } else {
             let smallCart = await this.getSmallCartInfo();
             console.log(`testing small cart`);
             console.log(smallCart);
             await this.driver.findElement( this.smallCartCheckout ).click();
         }
-
         return singleItem;
 
     }
