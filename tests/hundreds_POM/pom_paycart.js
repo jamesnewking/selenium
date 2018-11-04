@@ -12,22 +12,24 @@ module.exports = class PayCart {
 
     async getFinalCartInfo(){
         let payCart = {};
+        try{
+            await this.driver.wait(this.webdriver.until.elementLocated( this.showOrderSummary ), 5000);
+        }catch{
+            this.driver.sleep(3000);
+        }
         let orderSummaryDropdown = await this.driver.findElement( this.showOrderSummary ).isDisplayed();
         if ( orderSummaryDropdown ){
             await this.driver.findElement( this.showOrderSummary ).click();
         };
-
-        await this.driver.wait( this.webdriver.until.elementLocated( this.payCartTitle ) );
+        await this.driver.wait( this.webdriver.until.elementLocated( this.payCartTitle ), 3000 );
+        await this.driver.wait( this.webdriver.until.elementIsVisible( this.driver.findElement(this.payCartTitle) ), 3000 );
         payCart.title = await this.driver.findElement( this.payCartTitle ).getText();
         payCart.price = await this.driver.findElement( this.payCartPrice ).getText();
         payCart.sizeColor = await this.driver.findElement( this.payCartSizeColor ).getText();
         console.log(`The final pay cart title: ${payCart.title}, price: ${payCart.price}, size/color: ${payCart.sizeColor}`)
         const slashLoc = payCart.sizeColor.lastIndexOf('/');
-        //console.log( slashLoc);
         payCart.size = payCart.sizeColor.slice(0,slashLoc-1);
-        //console.log( `size: ${payCartSize}`);
         payCart.color = payCart.sizeColor.slice(slashLoc+2);
-        //console.log( `color: ${payCartColor}`);
         return payCart;
     }
 
