@@ -1,8 +1,5 @@
 const fetch = require('node-fetch');
 const webdriver = require('selenium-webdriver'),
-    //Builder = webdriver.Builder,
-    //By = webdriver.By,
-    //logging = webdriver.logging,
     until = webdriver.until;
 const { expect } = require('chai');
 var driver, testingBrowser;
@@ -98,7 +95,7 @@ describe( 'The Hundreds smoke test', () => {
         console.log(`Testing browser: ${testingBrowser}`);
         //____________________________________________//
         await driver.get('https://thehundreds.com/');
-        await driver.manage().setTimeouts({implicit:10000});
+        await driver.manage().setTimeouts({implicit:10000});//debug
         
         // if (browserToTest === 'edge'){
         //     //await driver.manage().window().maximize();
@@ -137,7 +134,9 @@ describe( 'The Hundreds smoke test', () => {
             console.log(`number of <img> tags: ${await imageArr.length}`);
             console.log(`number of <a> tags: ${await linkArr.length}`);
             await driver.executeScript("window.scrollTo(0,30000);");
-            await driver.sleep(1500);
+            //await driver.sleep(1500);
+            let lastElementOnPage = {'css' : `#PageContainer > footer > div > div > div.grid__item.large--six-twelfths > div.footer-newsletter`};
+            await driver.wait( webdriver.until.elementIsVisible( driver.findElement( lastElementOnPage )), 30000 );
             await driver.executeScript("window.scrollTo(0,-30000);");
             let badPictureLink = false;
             for (let i = 0; i < imageArr.length; i++) {
@@ -193,13 +192,15 @@ describe( 'The Hundreds smoke test', () => {
 
 
     it('(3) click shop on Nav', async () => {
-        
-        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 2000 )).isDisplayed();
+        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger), 2000 ).isDisplayed();
         console.log(`hamburger? ${await hamburgerIsVisible}`);
         if ( hamburgerIsVisible ) {
-            await driver.findElement( hundPath.topNavHamburger ).click();
-            await driver.wait(until.elementLocated( hundPath.topNavShop )).isDisplayed();
-            await driver.findElement( hundPath.topNavShop ).click();
+            await driver.findElement( hundPath.topNavHamburger ).click();;
+            await driver.wait(until.elementIsVisible( driver.findElement( hundPath.topNavShop )), 3000);
+            let topHamburgerShopButton = await driver.wait(until.elementIsEnabled( driver.findElement( hundPath.topNavShop )), 3000);
+            await driver.sleep(2000);
+            console.log('no sleep');
+            topHamburgerShopButton.click();
         } else {
         await driver.findElement( hundPath.topNavBarShop ).click(); 
         console.log('No hamburger');   
@@ -216,27 +217,15 @@ describe( 'The Hundreds smoke test', () => {
     it('(5) add item to cart, verify product in cart', async () => {
         let singleItem = {};
         let gridItem = {};
-        //await driver.switchTo().defaultContent().catch( ()=> console.log('can not find defaultContent window'));
-        if (testingBrowser==='safari'){
-            await driver.sleep(1500);
-        };
-        await driver.executeScript("window.scrollTo(0,30000);");
-        await driver.sleep(2500);
-        await driver.executeScript("window.scrollTo(0,-30000);");
         
+
         //let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
         let shopItem = new shopitem(driver, webdriver, 37);
         gridItem = await shopItem.addOneItem();
-        if (testingBrowser==='safari'){
-            await driver.sleep(3000);
-        };
         singleItem = await shopItem.addSingleItemToCart(1,1);
         console.log(`From the grid,  the item: ${ gridItem.title }, price: ${ gridItem.price }`);
         console.log(`From single item   title: ${ singleItem.title}, price: ${singleItem.price}, size: ${singleItem.size}, color: ${singleItem.color} `);
 
-        if (testingBrowser==='safari'){
-            await driver.sleep(3000);
-        };
         let finalPayCart = new PayCart(driver, webdriver);
         let checkOutCart = await finalPayCart.getFinalCartInfo();
         expect( gridItem.title.trim() ).to.equal( singleItem.title.trim()  ,'Error: product name does not match!');
