@@ -23,11 +23,8 @@ module.exports = class PayCart {
         payCart.sizeColor = await this.driver.findElement( this.payCartSizeColor ).getText();
         console.log(`The final pay cart title: ${payCart.title}, price: ${payCart.price}, size/color: ${payCart.sizeColor}`)
         const slashLoc = payCart.sizeColor.lastIndexOf('/');
-        //console.log( slashLoc);
         payCart.size = payCart.sizeColor.slice(0,slashLoc-1);
-        //console.log( `size: ${payCartSize}`);
         payCart.color = payCart.sizeColor.slice(slashLoc+2);
-        //console.log( `color: ${payCartColor}`);
         return payCart;
     }
 

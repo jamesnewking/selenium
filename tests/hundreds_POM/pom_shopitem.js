@@ -1,8 +1,7 @@
 module.exports = class ShopItem {
-    constructor (driver, webdriver, testingBrowser, gridItemNumber=1){
+    constructor (driver, webdriver, gridItemNumber=1){
         this.driver = driver;
         this.webdriver = webdriver;
-        this.testingBrowser = testingBrowser;
         this.gridItemNumber = gridItemNumber;
 
         this.itemElement =    { 'css' : `#PageContainer > main > div:nth-child(2) > div > div > div.grid-uniform > div`},
@@ -72,15 +71,10 @@ module.exports = class ShopItem {
     };
 
     async iterateGridItems(){
-        
         let originalNumber = this.gridItemNumber;
-        if (this.testingBrowser==='safari'){
-            await this.driver.sleep(3000);
-        }
         let allItemElements = await this.driver.findElements( this.itemElement );
         let numberOfItemsInGrid = allItemElements.length;
         let itemElement, itemTitle, itemPrice;
-        
         console.log(`Total number of items on this page: ${numberOfItemsInGrid}`);
         for (let i=1; i<numberOfItemsInGrid+1 ;i++){
             this.resetGridItemNumber(i); 
@@ -97,7 +91,7 @@ module.exports = class ShopItem {
     async addOneItem(){
         let gridItem = {};
         await this.driver.wait( this.webdriver.until.elementLocated( this.firstItemTitle ) );
-        await this.driver.sleep(2500);//needed for mobile viewports and safari
+        await this.driver.sleep(1000);//needed for mobile viewports
 
         gridItem.title = await this.driver.findElement( this.firstItemTitle ).getText();
         gridItem.price = await this.driver.findElement( this.firstItemPrice).getText();
@@ -154,15 +148,8 @@ module.exports = class ShopItem {
 
         //go to small cart
         await this.driver.findElement( this.addToCart ).click();
-        if (this.testingBrowser === 'safari'){
-            await this.driver.findElement( this.buyItNow ).click();//safari doesn't have the small cart
-        } else {
-            let smallCart = await this.getSmallCartInfo();
-            console.log(`testing small cart`);
-            console.log(smallCart);
-            await this.driver.findElement( this.smallCartCheckout ).click();
-        }
-
+        let smallCart = await this.getSmallCartInfo();
+        await this.driver.findElement( this.smallCartCheckout ).click();
         return singleItem;
 
     }
@@ -176,11 +163,6 @@ module.exports = class ShopItem {
         smallCart.smallCartPrice = await this.driver.findElement( this.smallCartPrice ).getText();
         smallCart.smallCartColor = await this.driver.findElement( this.smallCartColor ).getText();
         smallCart.smallCartSize = await this.driver.findElement( this.smallCartSize ).getText();
-
-        console.log(`small cart: ${smallCart.smallCartTitle}`);
-        console.log(`small cart: ${smallCart.smallCartPrice}`);
-        console.log(`small cart: ${smallCart.smallCartColor}`);
-        console.log(`small cart: ${smallCart.smallCartSize}`);
         return smallCart;
     }
 

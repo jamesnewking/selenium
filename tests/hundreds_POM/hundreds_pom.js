@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 const webdriver = require('selenium-webdriver'),
-    Builder = webdriver.Builder,
-    By = webdriver.By,
-    logging = webdriver.logging,
+    //Builder = webdriver.Builder,
+    //By = webdriver.By,
+    //logging = webdriver.logging,
     until = webdriver.until;
 const { expect } = require('chai');
 var driver, testingBrowser;
@@ -207,7 +207,7 @@ describe( 'The Hundreds smoke test', () => {
         
     });
 
-    it('(4) verify names/prices of items for purchase', async () => {
+    xit('(4) verify names/prices of items for purchase', async () => {
         let checkShopItem = new shopitem(driver, webdriver, testingBrowser);
         let numberItemsScreen = await checkShopItem.iterateGridItems();//debug
         expect( numberItemsScreen ).to.equal( 48 ,'Error: number of products does not match!');
@@ -224,7 +224,8 @@ describe( 'The Hundreds smoke test', () => {
         await driver.sleep(2500);
         await driver.executeScript("window.scrollTo(0,-30000);");
         
-        let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
+        //let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
+        let shopItem = new shopitem(driver, webdriver, 37);
         gridItem = await shopItem.addOneItem();
         if (testingBrowser==='safari'){
             await driver.sleep(3000);
