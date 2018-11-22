@@ -192,14 +192,16 @@ describe( 'The Hundreds smoke test', () => {
 
 
     it('(3) click shop on Nav', async () => {
-        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger), 2000 ).isDisplayed();
+        let hamburgerIsVisible = await driver.wait(until.elementLocated( hundPath.topNavHamburger, 2000 )).isDisplayed();
         console.log(`hamburger? ${await hamburgerIsVisible}`);
         if ( hamburgerIsVisible ) {
-            await driver.findElement( hundPath.topNavHamburger ).click();;
+            await driver.findElement( hundPath.topNavHamburger ).click();
             await driver.wait(until.elementIsVisible( driver.findElement( hundPath.topNavShop )), 3000);
+            //await driver.wait(until.elementLocated( hundPath.topNavShop )).isDisplayed();
             let topHamburgerShopButton = await driver.wait(until.elementIsEnabled( driver.findElement( hundPath.topNavShop )), 3000);
             await driver.sleep(2000);
             console.log('no sleep');
+            //await driver.findElement( hundPath.topNavShop ).click();
             topHamburgerShopButton.click();
         } else {
         await driver.findElement( hundPath.topNavBarShop ).click(); 
@@ -208,7 +210,7 @@ describe( 'The Hundreds smoke test', () => {
         
     });
 
-    xit('(4) verify names/prices of items for purchase', async () => {
+    it('(4) verify names/prices of items for purchase', async () => {
         let checkShopItem = new shopitem(driver, webdriver, testingBrowser);
         let numberItemsScreen = await checkShopItem.iterateGridItems();//debug
         expect( numberItemsScreen ).to.equal( 48 ,'Error: number of products does not match!');
@@ -218,9 +220,8 @@ describe( 'The Hundreds smoke test', () => {
         let singleItem = {};
         let gridItem = {};
         
-
-        //let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
-        let shopItem = new shopitem(driver, webdriver, 37);
+        let shopItem = new shopitem(driver, webdriver, testingBrowser, 37);
+        //shopItem.scrollDownUpPage();
         gridItem = await shopItem.addOneItem();
         singleItem = await shopItem.addSingleItemToCart(1,1);
         console.log(`From the grid,  the item: ${ gridItem.title }, price: ${ gridItem.price }`);
