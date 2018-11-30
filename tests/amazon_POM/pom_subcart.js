@@ -3,8 +3,8 @@ module.exports = class SubCart {
         this.driver = driver;
         this.webdriver = webdriver;
         
-        this.subCartPrice = { 'xpath' : '//*[@id="hlb-subcart"]/div[1]/span/span[2]'},
-        this.cartButton = { 'xpath' : '//*[@id="hlb-view-cart-announce"]'}
+        this.subCartPrice = { 'xpath' : '//*[@id="hlb-subcart"]/div[1]/span/span[2]'};
+        this.cartButton =   { 'xpath' : '//*[@id="hlb-view-cart-announce"]'};
 
     };
 
