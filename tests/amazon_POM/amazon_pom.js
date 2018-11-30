@@ -20,6 +20,7 @@ const viewPortSizes = require("./pom_viewport");
 const emulatePhones = require("./pom_emulate");
 const sPayCart = require("./pom_subcart");
 const PayCart = require("./pom_paycart");
+const checkPicture = require("./pom_checkpix");
 let startTime, endTime, setViewPort;
 
 
@@ -115,76 +116,16 @@ describe( 'Amazon smoke test', () => {
         // };
     } );
 
-    // after(async () => {
-    //     endTime = new Date();
-    //     console.log(`Ending test at ${endTime}`);
-    //     console.log(`The test took ${Math.floor( ((endTime-startTime)/1000) % 60 )} seconds`);
-    //     await driver.quit();
-    // });
-
     it(`(1) testing webpage title`, async () => {
         let webTitle = new title(driver);
         expect(webTitle.expectedTitleName).to.equal(await webTitle.actualWebTitle(), 'Error: main webpage title does not match')
     })
 
-
     it('(2) all img URLs are valid links, returns server code 200', async () => {
         if(checkPix==='--checkpix') {
-            let imageArr = await driver.findElements({'css': 'img'});
-            let linkArr = await driver.findElements({'css': 'a'});
-            console.log(`number of <img> tags: ${await imageArr.length}`);
-            console.log(`number of <a> tags: ${await linkArr.length}`);
-            await driver.executeScript("window.scrollTo(0,30000);");
-            //await driver.sleep(1500);
-            let lastElementOnPage = {'css' : `#navFooter > div.navFooterLine.navFooterLinkLine.navFooterPadItemLine.navFooterCopyright > ul > li.nav_first > a`};
-            await driver.wait( webdriver.until.elementIsVisible( driver.findElement( lastElementOnPage )), 30000 );
-            await driver.executeScript("window.scrollTo(0,-30000);");
-            let badPictureLink = false;
-            for (let i = 0; i < imageArr.length; i++) {
-                //console.log( await imageArr[i].getAttribute('src'));
-                let imgUrl;
-                try {
-                    imgUrl = await imageArr[i].getAttribute('src');
-                }
-                catch (err) {
-                    console.log("something wrong with this imgUrl #", i);
-                    badPictureLink = true;
-                    continue;
-                }
-
-                if (imgUrl == null) {
-                    console.log(`this imgUrl #${i} is null!`);
-                    continue;
-                }
-
-                // try {
-                //     expect(imgUrl).to.exist;
-                // }
-                // catch(err) {
-                //     console.log(`this imgUrl: does not exist`);
-                //     continue;
-                // }
-                expect(imgUrl).to.be.a("string");//.catch(() => console.log(`this imgUrl: ${imgUrl} is not a string`));
-                console.log(`${i}) `, imgUrl);
-                fetch(imgUrl)
-                    .then(
-                        (response) => {
-                            if (response.status === 200) {
-                                console.log(`${i})image link to ${imgUrl} is valid`);
-                                return;
-                            }
-                        }
-                    )
-                    .catch(
-                        (err) => {
-                            console.log('the image link has error: ', err);
-                            badPictureLink = true;
-                        }
-                    );
-
-            }
-            await driver.sleep(6000);
-            expect( badPictureLink ).to.equal( false ,'There is at lease one img with a bad link');
+            let checkingPictureLink = new checkPicture(driver, webdriver, fetch);
+            let hasBadPictureLink = await checkingPictureLink.checkForValidLink();
+            expect( hasBadPictureLink ).to.equal( false ,'There is at lease one img with a bad link');
         } else {
             console.log('--Checkpix did not run.');
         }
@@ -194,8 +135,12 @@ describe( 'Amazon smoke test', () => {
 
     it('(3) search for pillows', async () => {
         
-        await driver.findElement( amazonPath.searchBar ).sendKeys('pillow'); 
-        await driver.findElement( amazonPath.searchButton).click();
+        await driver.findElement( amazonPath.searchBar ).sendKeys('pillow').catch( async () => {
+            await driver.findElement( amazonPath.searchBarMobile ).sendKeys('pillow');
+        }); 
+        await driver.findElement( amazonPath.searchButton).click().catch( async () => {
+            await driver.findElement( amazonPath.searchButtonMobile ).click()
+        });
         await driver.sleep(3000);
     });
 

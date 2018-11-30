@@ -1,4 +1,4 @@
-# Smoke test of theHundreds.com using JS/Selenium/Mocha/Chai and Page Object Model
+# Smoke test of Amazon.com using JS/Selenium/Mocha/Chai and Page Object Model
 
 
 ## Before starting a selenium test
@@ -10,7 +10,7 @@
 # to run test with mocha/chai and selenium
 > make sure selenium server is running
 
-> mocha hundreds_pom.js --timeout=100000 --firefox --checkpix --ipadpro9 --ipadpro
+> mocha amazon_pom.js --timeout=100000 --firefox --checkpix --ipadpro9 --ipadpro
 
 > if there is no --firefox option, will run on chrome by default
 
